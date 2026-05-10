@@ -1,6 +1,6 @@
 <?php 
     // KHAI BÁO ĐƯỜNG DẪN GỐC - ĐÂY LÀ CHÌA KHÓA FIX LỖI VỠ GIAO DIỆN
-    $baseUrl = 'http://localhost/TanCang'; 
+    $baseUrl = 'http://localhost/Github/TanCang'; 
 ?>
 <!DOCTYPE html>
 <html lang="vi">
