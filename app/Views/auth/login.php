@@ -31,14 +31,14 @@
             <div class="alert alert-danger small py-2"><i class="fas fa-exclamation-circle"></i> <?= $error ?></div>
         <?php endif; ?>
 
-        <form action="" method="POST">
+        <form action="" method="POST" autocomplete="off">
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">Tài khoản</label>
                 <input type="text" name="username" class="form-control" placeholder="Nhập tên đăng nhập..." required>
             </div>
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">Mật khẩu</label>
-                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="new-password" required>
             </div>
             
             <!-- Phần CAPTCHA -->
