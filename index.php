@@ -1,4 +1,10 @@
 <?php
+// 0 có nghĩa là cookie chỉ tồn tại trong phiên làm việc hiện tại
+session_set_cookie_params(0, '/TanCang/'); 
+
+// 2. Thiết lập thời gian tự động đăng xuất sau 10 phút nếu không thao tác (tăng tính chuyên nghiệp)
+ini_set('session.gc_maxlifetime', 600);
+
 session_start();
 
 // Bật thông báo lỗi

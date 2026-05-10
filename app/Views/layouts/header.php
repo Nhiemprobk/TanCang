@@ -1,6 +1,6 @@
 <?php 
     // KHAI BÁO ĐƯỜNG DẪN GỐC - ĐÂY LÀ CHÌA KHÓA FIX LỖI VỠ GIAO DIỆN
-    $baseUrl = 'http://localhost/ThucTap'; 
+    $baseUrl = 'http://localhost/TanCang'; 
 ?>
 <!DOCTYPE html>
 <html lang="vi">
