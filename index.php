@@ -35,7 +35,11 @@ $page = $_GET['page'] ?? 'home'; // Lấy tham số url ?page=...
 
 switch ($page) {
     case 'home':
-        require_once 'app/Views/home/index.php'; // Giao diện Dashboard bạn vừa tạo ở tin nhắn trước
+        require_once 'app/Views/home/index.php';
+        break;
+
+    case 'profile':
+        require_once 'app/Views/profile/profile.php';
         break;
     
     case 'logout':

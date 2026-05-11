@@ -50,15 +50,26 @@
                 <i class="fas fa-bars"></i>
             </div>
             <div class="topbar-right">
-                <div class="icon-wrapper">
+            <div class="icon-wrapper dropdown">
+                <div data-bs-toggle="dropdown" style="cursor: pointer;">
                     <i class="fas fa-bell"></i>
-                    <span class="badge-noti">3</span>
-                </div>
+                    <span class="badge-noti" id="notiCount" style="display: none;">0</span>
+            </div>
+            <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" id="notiDrop" style="width: 350px; max-height: 450px; overflow-y: auto;">
+                <h6 class="dropdown-header bg-light py-3 fw-bold border-bottom">THÔNG BÁO HỆ THỐNG</h6>
+                <div id="notiList">
+                    <div class="text-center p-4 text-muted small">Đang tải dữ liệu...</div>
+            </div>
+        </div>
+    </div>
+    
+
+
                 <div class="user-profile dropdown">
                     <img src="https://ui-avatars.com/api/?name=Admin&background=fff&color=0284c7" alt="Avatar" class="rounded-circle me-2" width="35">
                     <span class="dropdown-toggle" data-bs-toggle="dropdown">Quản trị viên</span>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/index.php?page=profile"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="<?= $baseUrl ?>/index.php?page=logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
                     </ul>

@@ -108,3 +108,27 @@ body {
     background: #fff;
 }
 .dash-card:hover { transform: translateY(-5px); }
+
+/* Giao diện các dòng thông báo */
+.noti-item { 
+    padding: 15px 20px; 
+    border-bottom: 1px solid #f1f5f9; 
+    cursor: pointer; 
+    transition: background 0.2s; 
+}
+.noti-item:hover { background: #f8f9fa; }
+
+/* Trạng thái chưa đọc (Màu xanh dương nhạt) */
+.noti-item.unread { 
+    background: #e0f2fe; 
+    border-left: 4px solid #0284c7; 
+}
+
+/* Định dạng chữ */
+.noti-item h6 { margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #0f172a; }
+.noti-item p { margin: 0; font-size: 13px; color: #475569; }
+.noti-item .time { font-size: 11px; color: #94a3b8; margin-top: 8px; display: block; }
+
+/* Cảnh báo theo level */
+.level-urgent h6 { color: #dc3545; }
+.level-warning h6 { color: #f59e0b; }
