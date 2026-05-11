@@ -1,6 +1,8 @@
 <?php 
-    // KHAI BÁO ĐƯỜNG DẪN GỐC - ĐÂY LÀ CHÌA KHÓA FIX LỖI VỠ GIAO DIỆN
+    // KHAI BÁO ĐƯỜNG DẪN GỐC
     $baseUrl = 'http://localhost/Github/TanCang'; 
+    // Lấy tên trang hiện tại để bôi đậm Menu
+    $currentPage = $_GET['page'] ?? 'home'; 
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -8,27 +10,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Logistics Tân Cảng</title>
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS (Đã sửa đường dẫn) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= $baseUrl ?>/public/css/style.css">
 </head>
 <body>
 
 <div class="wrapper">
-    <!-- SIDEBAR MỚI (SÁNG MÀU) -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="fas fa-ship me-2"></i> LOGIS<span class="text-info">PORT</span>
         </div>
         <div class="sidebar-menu">
             <p class="menu-label">BẢNG ĐIỀU KHIỂN</p>
-            <a href="#" class="active"><i class="fas fa-chart-pie"></i> Tổng quan (Dashboard)</a>
+            <a href="<?= $baseUrl ?>/index.php?page=home" class="<?= ($currentPage == 'home') ? 'active' : '' ?>">
+                <i class="fas fa-chart-pie"></i> Tổng quan (Dashboard)
+            </a>
             
             <p class="menu-label mt-3">NGHIỆP VỤ LOGISTICS</p>
-            <a href="#"><i class="fas fa-clipboard-check"></i> Tiếp nhận lệnh / Đơn hàng</a>
+            <a href="<?= $baseUrl ?>/index.php?page=orders" class="<?= ($currentPage == 'orders') ? 'active' : '' ?>">
+                <i class="fas fa-clipboard-check"></i> Tiếp nhận lệnh / Đơn hàng
+            </a>
             <a href="#"><i class="fas fa-box"></i> Tra cứu Container</a>
             
             <p class="menu-label mt-3">HỆ THỐNG</p>
@@ -42,9 +45,7 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content">
-        <!-- TOPBAR MỚI (XANH ĐẠI DƯƠNG) -->
         <header class="topbar">
             <div class="toggle-btn" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
