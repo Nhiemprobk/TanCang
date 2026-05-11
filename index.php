@@ -48,7 +48,10 @@ switch ($page) {
         break;
 
     case 'orders':
-        require_once 'app/Views/orders/index.php';
+        // Đổi dòng gọi View cũ thành gọi Controller
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->index();
         break;
 
     default:
