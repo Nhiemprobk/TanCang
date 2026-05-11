@@ -43,6 +43,10 @@ switch ($page) {
         header("Location: index.php"); // Quay lại trang login
         break;
 
+    case 'orders':
+        require_once 'app/Views/orders/index.php';
+        break;
+
     default:
         echo "404 - Trang không tồn tại";
         break;
