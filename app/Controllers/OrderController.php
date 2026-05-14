@@ -13,17 +13,42 @@ class OrderController {
     }
 
     public function index() {
-        // 1. Lấy danh sách đơn hàng (Thay vì $pdo->query thì dùng $this->pdo->query)
-        $stmt = $this->pdo->query("SELECT * FROM logis_orders ORDER BY id DESC");
-        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // 1. ĐẾM SỐ LƯỢNG ĐƠN HÀNG THEO TỪNG TRẠNG THÁI
+        $count_stmt = $this->pdo->query("SELECT status, COUNT(*) as count FROM logis_orders GROUP BY status");
+        $counts = [];
+        while ($row = $count_stmt->fetch(PDO::FETCH_ASSOC)) {
+            $counts[$row['status']] = $row['count'];
+        }
 
-        // 2. Khởi tạo mảng thống kê cho bảng SUM
+        // 2. XỬ LÝ LỌC THEO TRẠNG THÁI TỪ URL
+        $current_status = $_GET['status'] ?? 'all';
+        $status_map = [
+            'cho_duyet' => 'Chờ duyệt',
+            'tu_choi' => 'Duyệt từ chối',
+            'dong_y' => 'Duyệt đồng ý',
+            'da_thanh_toan' => 'Đã thanh toán',
+            'dang_lam_hang' => 'Đang làm hàng',
+            'hoan_thanh' => 'Hoàn thành',
+            'cho_dung_don' => 'Chờ dừng đơn'
+        ];
+
+        // Nếu có chọn trạng thái cụ thể thì thêm WHERE vào câu SQL
+        if ($current_status !== 'all' && isset($status_map[$current_status])) {
+            $db_status = $status_map[$current_status];
+            $stmt = $this->pdo->prepare("SELECT * FROM logis_orders WHERE status = ? ORDER BY id DESC");
+            $stmt->execute([$db_status]);
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            // Nếu chọn "Tất cả" hoặc mới vào trang
+            $stmt = $this->pdo->query("SELECT * FROM logis_orders ORDER BY id DESC");
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // 3. TÍNH TOÁN BẢNG SUM (Giữ nguyên logic cũ)
         $summary = [
             'ha_rong' => ['20' => 0, '40' => 0, '45' => 0, 'tong' => 0],
             'cap_rong' => ['20' => 0, '40' => 0, '45' => 0, 'tong' => 0]
         ];
-
-        // 3. Tính toán số liệu tổng
         foreach ($orders as $o) {
             $type = ($o['action_type'] == 'Hạ rỗng') ? 'ha_rong' : 'cap_rong';
             $summary[$type]['20'] += $o['qty_20'];
@@ -32,7 +57,7 @@ class OrderController {
             $summary[$type]['tong'] += ($o['qty_20'] + $o['qty_40'] + $o['qty_45']);
         }
 
-        // 4. Gọi View và truyền dữ liệu ($orders và $summary) sang
+        // 4. TRUYỀN DỮ LIỆU SANG VIEW
         require_once 'app/Views/orders/index.php';
     }
 

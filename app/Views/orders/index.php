@@ -50,13 +50,22 @@
 <div class="dash-card p-3 mb-4">
     
     <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-        <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold filter-status" style="height: 31px;">Chờ duyệt (1)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Duyệt từ chối (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Duyệt đồng ý (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Đã thanh toán (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Đang làm hàng (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Hoàn thành (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Chờ dừng đơn (0)</button>
+        <?php $stt = $_GET['status'] ?? 'all'; ?>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=all" class="btn btn-sm rounded-pill px-3 <?= $stt == 'all' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Tất cả</a>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=cho_duyet" class="btn btn-sm rounded-pill px-3 <?= $stt == 'cho_duyet' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Chờ duyệt (<?= $counts['Chờ duyệt'] ?? 0 ?>)</a>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=tu_choi" class="btn btn-sm rounded-pill px-3 <?= $stt == 'tu_choi' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Duyệt từ chối (<?= $counts['Duyệt từ chối'] ?? 0 ?>)</a>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=dong_y" class="btn btn-sm rounded-pill px-3 <?= $stt == 'dong_y' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Duyệt đồng ý (<?= $counts['Duyệt đồng ý'] ?? 0 ?>)</a>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=da_thanh_toan" class="btn btn-sm rounded-pill px-3 <?= $stt == 'da_thanh_toan' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Đã thanh toán (<?= $counts['Đã thanh toán'] ?? 0 ?>)</a>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=dang_lam_hang" class="btn btn-sm rounded-pill px-3 <?= $stt == 'dang_lam_hang' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Đang làm hàng (<?= $counts['Đang làm hàng'] ?? 0 ?>)</a>
+        
+        <a href="<?= $baseUrl ?>/index.php?page=orders&status=hoan_thanh" class="btn btn-sm rounded-pill px-3 <?= $stt == 'hoan_thanh' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Hoàn thành (<?= $counts['Hoàn thành'] ?? 0 ?>)</a>
+        
         <button class="btn btn-danger btn-sm rounded-pill px-3 ms-auto d-flex align-items-center" style="height: 31px;"><i class="fas fa-times-circle me-1"></i> Từ chối đơn giá cũ</button>
     </div>
 
@@ -109,9 +118,9 @@
                         <td class="border-end"><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
                         <td class="border-end"><?= htmlspecialchars($row['creator_name']) ?></td>
                         
-                        <td class="border-end"></td>
-                        <td class="border-end"></td>
-                        <td class="border-end"></td>
+                        <td class="border-end"><?= !empty($row['approval_date']) ? date('d/m/Y H:i', strtotime($row['approval_date'])) : '' ?></td>
+                        <td class="border-end"><?= htmlspecialchars($row['approver_name'] ?? '') ?></td>
+                        <td class="border-end"><?= !empty($row['completion_date']) ? date('d/m/Y H:i', strtotime($row['completion_date'])) : '' ?></td>
                         
                         <td class="border-end">
                             <?php if($row['action_type'] == 'Hạ rỗng'): ?>
@@ -168,42 +177,37 @@
                         </tr>
                     </thead>
                     <tbody>
-    <?php if(!empty($orders)): ?>
-        <?php foreach($orders as $index => $row): ?>
-        <tr>
-            <td class="border-end"><?= $index + 1 ?></td>
-            <td class="border-end">
-                <button class="btn btn-sm btn-outline-primary p-1 rounded-circle" title="Sửa" style="width:26px;height:26px;"><i class="fas fa-edit" style="font-size: 11px;"></i></button>
-                <button class="btn btn-sm btn-outline-danger p-1 rounded-circle mx-1" title="Xóa" style="width:26px;height:26px;"><i class="fas fa-trash-alt" style="font-size: 11px;"></i></button>
-            </td>
-            <td class="fw-bold text-primary border-end"><?= htmlspecialchars($row['order_code']) ?></td>
-            <td class="border-end"><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
-            <td class="border-end"><?= htmlspecialchars($row['creator_name']) ?></td>
-            
-            <td class="border-end"><?= $row['approval_date'] ? date('d/m/Y H:i', strtotime($row['approval_date'])) : '' ?></td>
-            <td class="border-end"><?= htmlspecialchars($row['approver_name'] ?? '') ?></td>
-            <td class="border-end"><?= $row['completion_date'] ? date('d/m/Y H:i', strtotime($row['completion_date'])) : '' ?></td>
-            
-            <td class="border-end">
-                <span class="badge <?= ($row['action_type'] == 'Hạ rỗng') ? 'bg-info' : 'bg-warning' ?> text-dark">
-                    <?= htmlspecialchars($row['action_type']) ?>
-                </span>
-            </td>
-            <td class="border-end"><?= htmlspecialchars($row['depot_name']) ?></td>
-            <td class="border-end fw-semibold"><?= htmlspecialchars($row['shipping_line']) ?></td>
-            <td class="border-end"><?= htmlspecialchars($row['bl_do_bkg']) ?></td>
-            
-            <td class="border-end <?= $row['qty_20'] > 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= $row['qty_20'] ?></td>
-            <td class="border-end <?= $row['qty_40'] > 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= $row['qty_40'] ?></td>
-            <td class="border-end <?= $row['qty_45'] > 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= $row['qty_45'] ?></td>
-            
-            <td><?= htmlspecialchars($row['note']) ?></td>
-        </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr><td colspan="16" class="text-center py-3 text-muted">Chưa có đơn hàng nào trong hệ thống.</td></tr>
-    <?php endif; ?>
-</tbody>
+                        <tr>
+                            <td class="fw-bold bg-light">Hạ rỗng</td>
+                            <td><?= $summary['ha_rong']['20'] ?></td>
+                            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                            <td class="<?= $summary['ha_rong']['40'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['ha_rong']['40'] ?></td>
+                            <td class="<?= $summary['ha_rong']['45'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['ha_rong']['45'] ?></td>
+                            <td class="fw-bold text-primary"><?= $summary['ha_rong']['tong'] ?></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold bg-light">Cấp rỗng</td>
+                            <td class="<?= $summary['cap_rong']['20'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['cap_rong']['20'] ?></td>
+                            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                            <td class="<?= $summary['cap_rong']['40'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['cap_rong']['40'] ?></td>
+                            <td class="<?= $summary['cap_rong']['45'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['cap_rong']['45'] ?></td>
+                            <td class="fw-bold text-primary"><?= $summary['cap_rong']['tong'] ?></td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <td class="fw-bold">Tổng (CONT)</td>
+                            <?php 
+                                $tong20 = $summary['ha_rong']['20'] + $summary['cap_rong']['20'];
+                                $tong40 = $summary['ha_rong']['40'] + $summary['cap_rong']['40'];
+                                $tong45 = $summary['ha_rong']['45'] + $summary['cap_rong']['45'];
+                                $tongAll = $summary['ha_rong']['tong'] + $summary['cap_rong']['tong'];
+                            ?>
+                            <td class="fw-bold <?= $tong20 > 0 ? 'text-danger' : '' ?>"><?= $tong20 ?></td>
+                            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                            <td class="fw-bold <?= $tong40 > 0 ? 'text-danger' : '' ?>"><?= $tong40 ?></td>
+                            <td class="fw-bold <?= $tong45 > 0 ? 'text-danger' : '' ?>"><?= $tong45 ?></td>
+                            <td class="fw-bold text-danger fs-6"><?= $tongAll ?></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
