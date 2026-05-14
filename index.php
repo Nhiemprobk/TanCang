@@ -12,7 +12,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Nếu gửi Form đăng nhập (POST request)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
     require_once 'app/Controllers/AuthController.php';
     $auth = new AuthController();
     $auth->handleLogin();
@@ -52,6 +52,24 @@ switch ($page) {
         require_once 'app/Controllers/OrderController.php';
         $orderController = new OrderController();
         $orderController->index();
+        break;
+
+    case 'delete_order':
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->delete();
+        break;
+
+    case 'edit_order':
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->edit();
+        break;
+
+    case 'download_order':
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->download();
         break;
 
     default:

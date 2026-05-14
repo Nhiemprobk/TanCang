@@ -50,13 +50,13 @@
 <div class="dash-card p-3 mb-4">
     
     <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-        <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" style="height: 31px;">Chờ duyệt (1)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 31px;">Duyệt từ chối (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 31px;">Duyệt đồng ý (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 31px;">Đã thanh toán (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 31px;">Đang làm hàng (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 31px;">Hoàn thành (0)</button>
-        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 31px;">Chờ dừng đơn (0)</button>
+        <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold filter-status" style="height: 31px;">Chờ duyệt (1)</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Duyệt từ chối (0)</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Duyệt đồng ý (0)</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Đã thanh toán (0)</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Đang làm hàng (0)</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Hoàn thành (0)</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 filter-status" style="height: 31px;">Chờ dừng đơn (0)</button>
         <button class="btn btn-danger btn-sm rounded-pill px-3 ms-auto d-flex align-items-center" style="height: 31px;"><i class="fas fa-times-circle me-1"></i> Từ chối đơn giá cũ</button>
     </div>
 
@@ -93,15 +93,15 @@
                     <tr>
                         <td class="border-end"><?= $index + 1 ?></td>
                         <td class="border-end text-nowrap">
-                          <a href="#" class="btn btn-sm btn-outline-primary rounded-circle d-inline-flex justify-content-center align-items-center" title="Sửa" style="width:28px; height:28px;">
+                          <a href="<?= $baseUrl ?>/index.php?page=edit_order&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-primary rounded-circle d-inline-flex justify-content-center align-items-center" title="Sửa" style="width:28px; height:28px;">
                             <i class="fas fa-edit" style="font-size: 12px;"></i>
                           </a>
     
-                          <a href="#" class="btn btn-sm btn-outline-danger rounded-circle mx-1 d-inline-flex justify-content-center align-items-center" title="Xóa" style="width:28px; height:28px;" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');">
+                          <a href="<?= $baseUrl ?>/index.php?page=delete_order&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle mx-1 d-inline-flex justify-content-center align-items-center" title="Xóa" style="width:28px; height:28px;" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');">
                             <i class="fas fa-trash-alt" style="font-size: 12px;"></i>
                           </a>
 
-                          <a href="#" class="btn btn-sm btn-outline-success rounded-circle d-inline-flex justify-content-center align-items-center" title="Tải xuống" style="width:28px; height:28px;">
+                          <a href="<?= $baseUrl ?>/index.php?page=download_order&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-success rounded-circle d-inline-flex justify-content-center align-items-center" title="Tải xuống" style="width:28px; height:28px;">
                             <i class="fas fa-download" style="font-size: 12px;"></i>
                           </a>
                         </td>
@@ -209,5 +209,21 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusBtns = document.querySelectorAll('.filter-status');
+    statusBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            statusBtns.forEach(b => {
+                b.classList.remove('btn-primary', 'fw-bold');
+                b.classList.add('btn-outline-secondary');
+            });
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-primary', 'fw-bold');
+        });
+    });
+});
+</script>
 
 <?php require_once 'app/Views/layouts/footer.php'; ?>
