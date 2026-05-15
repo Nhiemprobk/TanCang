@@ -87,6 +87,12 @@ switch ($page) {
         $orderController->download();
         break;
 
+    case 'reject_old_price':
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->rejectOldPrice();
+        break;
+
     default:
         echo "404 - Trang không tồn tại";
         break;

@@ -201,5 +201,33 @@ class OrderController {
         echo $content;
         exit();
     }
+
+    public function rejectOldPrice() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Lấy lý do từ form
+            $reason = $_POST['reject_reason'] ?? 'Từ chối do đơn giá cũ';
+            
+            // Lấy thông tin người duyệt và thời gian
+            $approver_name = $_SESSION['username'] ?? 'Admin';
+            $approval_date = date('Y-m-d H:i:s');
+            $new_status = 'Duyệt từ chối';
+
+            // Cập nhật Database: Chuyển toàn bộ đơn "Chờ duyệt" thành "Duyệt từ chối"
+            // Đồng thời nối thêm Lý do vào cột Ghi chú (note)
+            $sql = "UPDATE logis_orders 
+                    SET status = ?, 
+                        approver_name = ?, 
+                        approval_date = ?, 
+                        note = CONCAT(IFNULL(note, ''), ' [Lý do từ chối: ', ?, ']')
+                    WHERE status = 'Chờ duyệt'";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$new_status, $approver_name, $approval_date, $reason]);
+        }
+
+        // Cập nhật xong thì đá về trang danh sách và mở sẵn tab "Duyệt từ chối" để xem kết quả
+        header("Location: index.php?page=orders&status=tu_choi");
+        exit();
+    }
 }
 ?>
