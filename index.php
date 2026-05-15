@@ -6,6 +6,12 @@ session_set_cookie_params(0, '/');
 ini_set('session.gc_maxlifetime', 600);
 
 session_start();
+// Nhúng file autoload của Composer
+require_once 'vendor/autoload.php'; 
+
+// Bật thông báo lỗi
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) {
     // Nếu đã lưu thời gian hoạt động cuối, và thời gian đó cách hiện tại quá 10 phút (600 giây)

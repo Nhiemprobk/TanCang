@@ -1,4 +1,9 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class OrderController {
     
@@ -160,7 +165,7 @@ class OrderController {
         }
         $id = $_GET['id'];
 
-        // Lấy thông tin đơn hàng từ DB
+        // Truy vấn CSDL
         $stmt = $this->pdo->prepare("SELECT * FROM logis_orders WHERE id = ?");
         $stmt->execute([$id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -169,38 +174,112 @@ class OrderController {
             die("Không tìm thấy đơn hàng!");
         }
 
-        // Tạo nội dung cho file TXT
-        $content = "========================================\r\n";
-        $content .= "         PHIẾU TIẾP NHẬN ĐƠN HÀNG       \r\n";
-        $content .= "           Hệ thống LOGISPORT           \r\n";
-        $content .= "========================================\r\n\r\n";
-        $content .= "Mã đơn hàng : " . $order['order_code'] . "\r\n";
-        $content .= "Người tạo   : " . $order['creator_name'] . "\r\n";
-        $content .= "Ngày gửi    : " . date('d/m/Y H:i', strtotime($order['created_at'])) . "\r\n";
-        $content .= "Phương án   : " . $order['action_type'] . "\r\n";
-        $content .= "Depot       : " . $order['depot_name'] . "\r\n";
-        $content .= "Hãng tàu    : " . $order['shipping_line'] . "\r\n";
-        $content .= "Số BL/DO/BKG: " . ($order['bl_do_bkg'] ? $order['bl_do_bkg'] : 'N/A') . "\r\n\r\n";
-        $content .= "---------------- CHI TIẾT --------------\r\n";
-        $content .= "Cont 20'    : " . $order['qty_20'] . " cont\r\n";
-        $content .= "Cont 40'    : " . $order['qty_40'] . " cont\r\n";
-        $content .= "Cont 45'    : " . $order['qty_45'] . " cont\r\n";
-        $content .= "Ghi chú     : " . ($order['note'] ? $order['note'] : 'Không có') . "\r\n";
-        $content .= "========================================\r\n";
-        $content .= "Trạng thái  : " . strtoupper($order['status']) . "\r\n";
+        // 1. Khởi tạo một file Excel mới
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // 2. Đặt tiêu đề cho Sheet
+        $sheet->setTitle('Phiếu Đơn Hàng');
 
-        // Tên file khi tải về máy tính
-        $filename = "Phieu_Don_Hang_" . $order['order_code'] . ".txt";
+        // 3. Ghi dữ liệu vào các ô
+        // Dòng Tiêu đề
+        $sheet->setCellValue('A1', 'PHIẾU TIẾP NHẬN ĐƠN HÀNG - LOGISPORT');
+        $sheet->mergeCells('A1:B1'); // Gộp ô A1 và B1
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Thiết lập Header để ép trình duyệt tải file về thay vì hiển thị ra màn hình
-        header('Content-Type: text/plain; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Content-Length: ' . strlen($content));
+        // Các dòng dữ liệu
+        $sheet->setCellValue('A3', 'Mã đơn hàng');
+        $sheet->setCellValue('B3', $order['order_code']);
 
-        // In nội dung ra (Trình duyệt sẽ gom vào file tải về)
-        echo $content;
+        $sheet->setCellValue('A4', 'Người tạo');
+        $sheet->setCellValue('B4', $order['creator_name']);
+
+        $sheet->setCellValue('A5', 'Ngày gửi');
+        $sheet->setCellValue('B5', date('d/m/Y H:i', strtotime($order['created_at'])));
+
+        $sheet->setCellValue('A6', 'Phương án');
+        $sheet->setCellValue('B6', $order['action_type']);
+
+        $sheet->setCellValue('A7', 'Depot');
+        $sheet->setCellValue('B7', $order['depot_name']);
+
+        $sheet->setCellValue('A8', 'Hãng tàu');
+        $sheet->setCellValue('B8', $order['shipping_line']);
+
+        $sheet->setCellValue('A9', 'Số BL/DO/BKG');
+        $sheet->setCellValue('B9', $order['bl_do_bkg'] ? $order['bl_do_bkg'] : 'N/A');
+
+        $sheet->setCellValue('A11', 'CHI TIẾT CONTAINER');
+        $sheet->mergeCells('A11:B11');
+        $sheet->getStyle('A11')->getFont()->setBold(true);
+
+        $sheet->setCellValue('A12', "Cont 20'");
+        $sheet->setCellValue('B12', $order['qty_20'] . ' cont');
+
+        $sheet->setCellValue('A13', "Cont 40'");
+        $sheet->setCellValue('B13', $order['qty_40'] . ' cont');
+
+        $sheet->setCellValue('A14', "Cont 45'");
+        $sheet->setCellValue('B14', $order['qty_45'] . ' cont');
+
+        $sheet->setCellValue('A15', 'Ghi chú');
+        $sheet->setCellValue('B15', $order['note'] ? $order['note'] : 'Không có');
+
+        $sheet->setCellValue('A16', 'Trạng thái');
+        $sheet->setCellValue('B16', mb_strtoupper($order['status'], 'UTF-8'));
+
+        // 4. Định dạng file cho đẹp       
+        $sheet->getStyle('A1:B16')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+        $sheet->getStyle('A1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF3275B2'); 
+        $sheet->getStyle('A1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle('A11')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFEAECEF');
+        $sheet->getStyle('A11')->getFont()->setBold(true);
+        $sheet->getStyle('A11')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle('B16')->getFont()->getColor()->setARGB('FFD32F2F');
+        $sheet->getStyle('B16')->getFont()->setBold(true);
+
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle('A1:B16')->applyFromArray($styleArray);
+
+
+        $sheet->getStyle('A3:A16')->getFont()->setBold(true);
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(40);
+        
+
+        for ($i = 1; $i <= 16; $i++) {
+            if ($i == 1) {
+                $sheet->getRowDimension($i)->setRowHeight(35); // Dòng tiêu đề cao hơn
+            } else {
+                $sheet->getRowDimension($i)->setRowHeight(22);
+            }
+        }
+
+        // 5. Xuất file trả về cho trình duyệt
+        $filename = "Phieu_Don_Hang_" . $order['order_code'] . ".xlsx";
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
         exit();
     }
+
 
     public function rejectOldPrice() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
