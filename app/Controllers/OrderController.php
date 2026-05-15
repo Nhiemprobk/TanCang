@@ -22,6 +22,9 @@ class OrderController {
 
         // 2. XỬ LÝ LỌC THEO TRẠNG THÁI TỪ URL
         $current_status = $_GET['status'] ?? 'all';
+        $search_text = trim($_GET['search_text'] ?? '');
+        $search_type = $_GET['search_type'] ?? 'all';
+
         $status_map = [
             'cho_duyet' => 'Chờ duyệt',
             'tu_choi' => 'Duyệt từ chối',
@@ -32,17 +35,40 @@ class OrderController {
             'cho_dung_don' => 'Chờ dừng đơn'
         ];
 
-        // Nếu có chọn trạng thái cụ thể thì thêm WHERE vào câu SQL
+        // Khởi tạo câu SQL gốc và mảng chứa tham số bảo mật
+        $sql = "SELECT * FROM logis_orders WHERE 1=1";
+        $params = [];
+
+        // NẾU CÓ LỌC THEO TRẠNG THÁI: Ghép thêm điều kiện trạng thái
         if ($current_status !== 'all' && isset($status_map[$current_status])) {
-            $db_status = $status_map[$current_status];
-            $stmt = $this->pdo->prepare("SELECT * FROM logis_orders WHERE status = ? ORDER BY id DESC");
-            $stmt->execute([$db_status]);
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            // Nếu chọn "Tất cả" hoặc mới vào trang
-            $stmt = $this->pdo->query("SELECT * FROM logis_orders ORDER BY id DESC");
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $sql .= " AND status = ?";
+            $params[] = $status_map[$current_status];
         }
+
+        // NẾU CÓ GÕ TÌM KIẾM: Ghép thêm điều kiện LIKE
+        if (!empty($search_text)) {
+            if ($search_type === 'order_code') {
+                $sql .= " AND order_code LIKE ?";
+                $params[] = "%$search_text%";
+            } elseif ($search_type === 'creator_name') {
+                $sql .= " AND creator_name LIKE ?";
+                $params[] = "%$search_text%";
+            } else { // Tìm theo 'Tất cả'
+                $sql .= " AND (order_code LIKE ? OR creator_name LIKE ? OR bl_do_bkg LIKE ?)";
+                // Đẩy tham số vào 3 lần cho 3 dấu chấm hỏi ở trên
+                $params[] = "%$search_text%"; 
+                $params[] = "%$search_text%";
+                $params[] = "%$search_text%";
+            }
+        }
+
+        // Cuối cùng là chốt lại bằng sắp xếp mới nhất lên đầu
+        $sql .= " ORDER BY id DESC";
+
+        // Thực thi câu lệnh SQL động
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 3. TÍNH TOÁN BẢNG SUM (Giữ nguyên logic cũ)
         $summary = [
