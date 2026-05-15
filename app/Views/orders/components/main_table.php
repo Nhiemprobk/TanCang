@@ -60,7 +60,7 @@
                         </td>
                         <td class="border-end"><?= htmlspecialchars($row['depot_name']) ?></td>
                         <td class="border-end fw-semibold"><?= htmlspecialchars($row['shipping_line']) ?></td>
-                        <td class="border-end"><?= htmlspecialchars($row['bl_do_bkg']) ?></td>
+                        <td class="border-end"><?= htmlspecialchars($row['bl_do_bkg']??'') ?></td>
                         
                         <td class="border-end <?= $row['qty_20'] > 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= $row['qty_20'] ?></td>
                         <td class="border-end <?= $row['qty_40'] > 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= $row['qty_40'] ?></td>
