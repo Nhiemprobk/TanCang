@@ -13,77 +13,67 @@ class OrderController {
     }
 
     public function index() {
-        // 1. ĐẾM SỐ LƯỢNG ĐƠN HÀNG THEO TỪNG TRẠNG THÁI
-        $count_stmt = $this->pdo->query("SELECT status, COUNT(*) as count FROM logis_orders GROUP BY status");
-        $counts = [];
-        while ($row = $count_stmt->fetch(PDO::FETCH_ASSOC)) {
-            $counts[$row['status']] = $row['count'];
-        }
-
-        // 2. XỬ LÝ LỌC THEO TRẠNG THÁI TỪ URL
+        // 1. LẤY CÁC THAM SỐ TỪ URL
         $current_status = $_GET['status'] ?? 'all';
         $search_text = trim($_GET['search_text'] ?? '');
         $search_type = $_GET['search_type'] ?? 'all';
+        
+        // Tham số phân trang
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; // Số dòng trên 1 trang
+        $p = isset($_GET['p']) ? (int)$_GET['p'] : 1;             // Trang hiện tại
+        if ($p < 1) $p = 1;
+        $offset = ($p - 1) * $limit; // Vị trí bắt đầu lấy dữ liệu
 
         $status_map = [
-            'cho_duyet' => 'Chờ duyệt',
-            'tu_choi' => 'Duyệt từ chối',
-            'dong_y' => 'Duyệt đồng ý',
-            'da_thanh_toan' => 'Đã thanh toán',
-            'dang_lam_hang' => 'Đang làm hàng',
-            'hoan_thanh' => 'Hoàn thành',
-            'cho_dung_don' => 'Chờ dừng đơn'
+            'cho_duyet' => 'Chờ duyệt', 'tu_choi' => 'Duyệt từ chối', 'dong_y' => 'Duyệt đồng ý',
+            'da_thanh_toan' => 'Đã thanh toán', 'dang_lam_hang' => 'Đang làm hàng', 
+            'hoan_thanh' => 'Hoàn thành', 'cho_dung_don' => 'Chờ dừng đơn'
         ];
 
-        // Khởi tạo câu SQL gốc và mảng chứa tham số bảo mật
-        $sql = "SELECT * FROM logis_orders WHERE 1=1";
+        // 2. XÂY DỰNG ĐIỀU KIỆN WHERE (Dùng chung cho cả đếm tổng và lấy dữ liệu)
+        $where = " WHERE 1=1";
         $params = [];
-
-        // NẾU CÓ LỌC THEO TRẠNG THÁI: Ghép thêm điều kiện trạng thái
         if ($current_status !== 'all' && isset($status_map[$current_status])) {
-            $sql .= " AND status = ?";
+            $where .= " AND status = ?";
             $params[] = $status_map[$current_status];
         }
-
-        // NẾU CÓ GÕ TÌM KIẾM: Ghép thêm điều kiện LIKE
         if (!empty($search_text)) {
             if ($search_type === 'order_code') {
-                $sql .= " AND order_code LIKE ?";
-                $params[] = "%$search_text%";
+                $where .= " AND order_code LIKE ?"; $params[] = "%$search_text%";
             } elseif ($search_type === 'creator_name') {
-                $sql .= " AND creator_name LIKE ?";
-                $params[] = "%$search_text%";
-            } else { // Tìm theo 'Tất cả'
-                $sql .= " AND (order_code LIKE ? OR creator_name LIKE ? OR bl_do_bkg LIKE ?)";
-                // Đẩy tham số vào 3 lần cho 3 dấu chấm hỏi ở trên
-                $params[] = "%$search_text%"; 
-                $params[] = "%$search_text%";
-                $params[] = "%$search_text%";
+                $where .= " AND creator_name LIKE ?"; $params[] = "%$search_text%";
+            } else {
+                $where .= " AND (order_code LIKE ? OR creator_name LIKE ? OR bl_do_bkg LIKE ?)";
+                array_push($params, "%$search_text%", "%$search_text%", "%$search_text%");
             }
         }
 
-        // Cuối cùng là chốt lại bằng sắp xếp mới nhất lên đầu
-        $sql .= " ORDER BY id DESC";
+        // 3. ĐẾM TỔNG SỐ DÒNG (Để tính tổng số trang)
+        $count_sql = "SELECT COUNT(*) FROM logis_orders" . $where;
+        $stmt_count = $this->pdo->prepare($count_sql);
+        $stmt_count->execute($params);
+        $total_records = $stmt_count->fetchColumn();
+        $total_pages = ceil($total_records / $limit);
 
-        // Thực thi câu lệnh SQL động
+        // 4. LẤY DỮ LIỆU CÓ GIỚI HẠN (LIMIT ... OFFSET ...)
+        $sql = "SELECT * FROM logis_orders" . $where . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. TÍNH TOÁN BẢNG SUM (Giữ nguyên logic cũ)
-        $summary = [
-            'ha_rong' => ['20' => 0, '40' => 0, '45' => 0, 'tong' => 0],
-            'cap_rong' => ['20' => 0, '40' => 0, '45' => 0, 'tong' => 0]
-        ];
+        // 5. ĐẾM SỐ LƯỢNG CHO CÁC NÚT TAB (Giữ nguyên)
+        $count_stmt = $this->pdo->query("SELECT status, COUNT(*) as count FROM logis_orders GROUP BY status");
+        $counts = [];
+        while ($row = $count_stmt->fetch(PDO::FETCH_ASSOC)) { $counts[$row['status']] = $row['count']; }
+
+        // 6. TÍNH TOÁN BẢNG SUM (Tính trên dữ liệu đã lọc của trang hiện tại)
+        $summary = ['ha_rong' => ['20'=>0,'40'=>0,'45'=>0,'tong'=>0], 'cap_rong' => ['20'=>0,'40'=>0,'45'=>0,'tong'=>0]];
         foreach ($orders as $o) {
             $type = ($o['action_type'] == 'Hạ rỗng') ? 'ha_rong' : 'cap_rong';
-            $summary[$type]['20'] += $o['qty_20'];
-            $summary[$type]['40'] += $o['qty_40'];
-            $summary[$type]['45'] += $o['qty_45'];
-            $summary[$type]['tong'] += ($o['qty_20'] + $o['qty_40'] + $o['qty_45']);
+            $summary[$type]['20'] += $o['qty_20']; $summary[$type]['40'] += $o['qty_40'];
+            $summary[$type]['45'] += $o['qty_45']; $summary[$type]['tong'] += ($o['qty_20'] + $o['qty_40'] + $o['qty_45']);
         }
 
-        // 4. TRUYỀN DỮ LIỆU SANG VIEW
         require_once 'app/Views/orders/index.php';
     }
 
