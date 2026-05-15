@@ -30,7 +30,7 @@
             // Xử lý khung hiển thị thông báo
             const notiList = document.getElementById('notiList');
             if(data.notifications.length === 0) {
-                notiList.innerHTML = '<div class="text-center p-4 text-muted small"><i class="fas fa-box-open fs-3 mb-2 opacity-50"></i><br>Bạn đã đọc hết thông báo</div>';
+                notiList.innerHTML = '<div class="text-center p-4 text-muted small"><i class="fas fa-box-open fs-3 mb-2 opacity-50"></i><br>Không có thông báo</div>';
                 return;
             }
             
