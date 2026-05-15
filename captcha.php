@@ -2,7 +2,7 @@
 session_start();
 
 // 1. Tạo chuỗi ngẫu nhiên 5 ký tự (chữ hoa và số)
-$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+$chars = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
 $captcha_code = substr(str_shuffle($chars), 0, 5);
 
 // 2. Lưu vào session để tí nữa so sánh với user nhập
