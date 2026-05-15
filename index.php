@@ -104,7 +104,24 @@ switch ($page) {
         $userCtrl = new UserController();
         $userCtrl->index();
         break;
-        
+    
+    case 'pricing':
+        require_once 'app/Controllers/PricingController.php';
+        $pricingController = new PricingController();
+        $pricingController->index();
+        break;
+    case 'update_pricing':
+        require_once 'app/Controllers/PricingController.php';
+        $pricingController = new PricingController();
+        $pricingController->update();
+        break;
+
+    case 'update_order':
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->update();
+        break;
+
     default:
         echo "404 - Trang không tồn tại";
         break;

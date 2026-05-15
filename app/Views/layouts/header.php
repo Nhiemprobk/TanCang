@@ -32,14 +32,16 @@
             <a href="<?= $baseUrl ?>/index.php?page=orders" class="<?= ($currentPage == 'orders') ? 'active' : '' ?>">
                 <i class="fas fa-clipboard-check"></i> Tiếp nhận lệnh / Đơn hàng
             </a>
-            <a href="#"><i class="fas fa-box"></i> Tra cứu Container</a>
+            
+            <li class="nav-item mb-2">
+              <a href="<?= $baseUrl ?>/index.php?page=pricing" class="nav-link <?= (isset($_GET['page']) && $_GET['page'] == 'pricing') ? 'active bg-primary text-white' : 'text-dark' ?> px-3 py-2 rounded-3 fw-medium d-flex align-items-center">
+                <i class="fas fa-tags me-3 <?= (isset($_GET['page']) && $_GET['page'] == 'pricing') ? 'text-white' : 'text-primary' ?> fs-5"></i>
+                 <span>Biểu giá dịch vụ</span>
+              </a>
+            </li>
             
             <p class="menu-label mt-3">HỆ THỐNG</p>
-            <a href="#quanTriMenu" data-bs-toggle="collapse"><i class="fas fa-database"></i> Quản lý Danh mục <i class="fas fa-angle-down float-end mt-1"></i></a>
-            <div class="collapse" id="quanTriMenu">
-                <a href="#" class="ps-4"><i class="fas fa-warehouse"></i> Danh mục Depot</a>
-                <a href="#" class="ps-4"><i class="fas fa-anchor"></i> Hãng tàu & Biểu phí</a>
-            </div>
+            
             <a href="<?= $baseUrl ?>/index.php?page=users" class="<?= ($currentPage == 'users') ? 'active' : '' ?>">
     <i class="fas fa-users-cog"></i> Quản trị Tài khoản
 </a>

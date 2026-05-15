@@ -1,51 +1,44 @@
 <div class="row justify-content-center mb-4">
-    <div class="col-md-9">
+    <div class="col-12">
         <div class="dash-card p-3">
-            <div class="table-responsive border rounded">
-                <table class="table table-bordered table-sm text-center align-middle mb-0" style="font-size: 13px;">
-                    <thead style="background-color: #0284c7; color: white;">
+            <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-chart-pie text-success me-2"></i>Tổng hợp sản lượng trang hiện tại</h6>
+            
+            <div class="table-responsive table-scrollable">
+                <table class="table table-bordered table-sm text-center align-middle mb-0 text-nowrap" style="font-size: 13px;">
+                    <thead class="table-light">
                         <tr>
-                            <th class="py-2">SUM</th>
-                            <th class="py-2">20'GP</th><th class="py-2">40'GP</th><th class="py-2">40'HC</th>
-                            <th class="py-2">20'OT</th><th class="py-2">20'FL</th><th class="py-2">40'FL</th>
-                            <th class="py-2">40'OT</th><th class="py-2">45'</th>
-                            <th class="py-2 bg-primary text-white">Tổng</th>
+                            <th class="text-start" style="min-width: 130px;">Loại tác vụ</th>
+                            
+                            <?php foreach ($containerTypes as $cType): ?>
+                                <th><?= htmlspecialchars($cType) ?></th>
+                            <?php endforeach; ?>
+                            
+                            <th class="bg-warning bg-opacity-25 fw-bold">Tổng cộng</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="fw-bold bg-light">Hạ rỗng</td>
-                            <td><?= $summary['ha_rong']['20'] ?></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="<?= $summary['ha_rong']['40'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['ha_rong']['40'] ?></td>
-                            <td class="<?= $summary['ha_rong']['45'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['ha_rong']['45'] ?></td>
-                            <td class="fw-bold text-primary"><?= $summary['ha_rong']['tong'] ?></td>
+                            <td class="text-start fw-bold text-info"><i class="fas fa-arrow-down me-1"></i>Hạ rỗng</td>
+                            
+                            <?php foreach ($containerTypes as $cType): ?>
+                                <td><?= $summary['ha_rong'][$cType] > 0 ? '<span class="fw-bold text-dark">'.$summary['ha_rong'][$cType].'</span>' : '<span class="text-muted opacity-50">-</span>' ?></td>
+                            <?php endforeach; ?>
+                            
+                            <td class="bg-warning bg-opacity-10 fw-bold fs-6 text-danger"><?= $summary['ha_rong']['tong'] ?></td>
                         </tr>
                         <tr>
-                            <td class="fw-bold bg-light">Cấp rỗng</td>
-                            <td class="<?= $summary['cap_rong']['20'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['cap_rong']['20'] ?></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="<?= $summary['cap_rong']['40'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['cap_rong']['40'] ?></td>
-                            <td class="<?= $summary['cap_rong']['45'] > 0 ? 'text-danger fw-bold' : '' ?>"><?= $summary['cap_rong']['45'] ?></td>
-                            <td class="fw-bold text-primary"><?= $summary['cap_rong']['tong'] ?></td>
-                        </tr>
-                        <tr class="table-secondary">
-                            <td class="fw-bold">Tổng (CONT)</td>
-                            <?php 
-                                $tong20 = $summary['ha_rong']['20'] + $summary['cap_rong']['20'];
-                                $tong40 = $summary['ha_rong']['40'] + $summary['cap_rong']['40'];
-                                $tong45 = $summary['ha_rong']['45'] + $summary['cap_rong']['45'];
-                                $tongAll = $summary['ha_rong']['tong'] + $summary['cap_rong']['tong'];
-                            ?>
-                            <td class="fw-bold <?= $tong20 > 0 ? 'text-danger' : '' ?>"><?= $tong20 ?></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="fw-bold <?= $tong40 > 0 ? 'text-danger' : '' ?>"><?= $tong40 ?></td>
-                            <td class="fw-bold <?= $tong45 > 0 ? 'text-danger' : '' ?>"><?= $tong45 ?></td>
-                            <td class="fw-bold text-danger fs-6"><?= $tongAll ?></td>
+                            <td class="text-start fw-bold text-warning"><i class="fas fa-arrow-up me-1"></i>Cấp rỗng</td>
+                            
+                            <?php foreach ($containerTypes as $cType): ?>
+                                <td><?= $summary['cap_rong'][$cType] > 0 ? '<span class="fw-bold text-dark">'.$summary['cap_rong'][$cType].'</span>' : '<span class="text-muted opacity-50">-</span>' ?></td>
+                            <?php endforeach; ?>
+                            
+                            <td class="bg-warning bg-opacity-10 fw-bold fs-6 text-danger"><?= $summary['cap_rong']['tong'] ?></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 </div>

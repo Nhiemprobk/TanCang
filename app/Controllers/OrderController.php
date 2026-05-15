@@ -79,7 +79,14 @@ class OrderController {
         $total_pages = ceil($total_records / $limit);
 
         // 4. LẤY DỮ LIỆU CÓ GIỚI HẠN (LIMIT ... OFFSET ...)
-        $sql = "SELECT * FROM logis_orders" . $where . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
+        $sql = "SELECT o.*, 
+        GROUP_CONCAT(CONCAT(d.quantity, 'x', p.container_type) SEPARATOR ', ') as container_details,
+        SUM(d.quantity * p.price) as total_order_price
+        FROM logis_orders o
+        LEFT JOIN logis_order_details d ON o.id = d.order_id
+        LEFT JOIN logis_pricing p ON d.pricing_id = p.id" 
+        . $where . 
+        " GROUP BY o.id ORDER BY o.id DESC LIMIT $limit OFFSET $offset";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -89,12 +96,41 @@ class OrderController {
         $counts = [];
         while ($row = $count_stmt->fetch(PDO::FETCH_ASSOC)) { $counts[$row['status']] = $row['count']; }
 
-        // 6. TÍNH TOÁN BẢNG SUM (Tính trên dữ liệu đã lọc của trang hiện tại)
-        $summary = ['ha_rong' => ['20'=>0,'40'=>0,'45'=>0,'tong'=>0], 'cap_rong' => ['20'=>0,'40'=>0,'45'=>0,'tong'=>0]];
+        // 6. TÍNH TOÁN BẢNG SUM (Phiên bản Động - Tự động nhận diện mọi loại Cont)
+        
+        // 6.1. Lấy tất cả các loại Cont đang có trong bảng Giá để làm tiêu đề cột
+        $stmtTypes = $this->pdo->query("SELECT container_type FROM logis_pricing ORDER BY id ASC");
+        $containerTypes = $stmtTypes->fetchAll(PDO::FETCH_COLUMN); // Mảng chứa ['20 DC', '40 DC', '40 HC'...]
+
+        // 6.2. Khởi tạo mảng thống kê chứa tất cả các loại Cont đó với giá trị ban đầu là 0
+        $summary = [
+            'ha_rong' => array_fill_keys($containerTypes, 0),
+            'cap_rong' => array_fill_keys($containerTypes, 0)
+        ];
+        $summary['ha_rong']['tong'] = 0;
+        $summary['cap_rong']['tong'] = 0;
+
+        // 6.3. Vòng lặp đếm số lượng từ chuỗi (vd: "2x20 DC, 1x40 RF")
         foreach ($orders as $o) {
             $type = ($o['action_type'] == 'Hạ rỗng') ? 'ha_rong' : 'cap_rong';
-            $summary[$type]['20'] += $o['qty_20']; $summary[$type]['40'] += $o['qty_40'];
-            $summary[$type]['45'] += $o['qty_45']; $summary[$type]['tong'] += ($o['qty_20'] + $o['qty_40'] + $o['qty_45']);
+            
+            if (!empty($o['container_details'])) {
+                $items = explode(',', $o['container_details']);
+                foreach ($items as $item) {
+                    $item = trim($item);
+                    // Dùng Regex lấy số lượng (trước chữ x) và tên Loại Cont (sau chữ x)
+                    if (preg_match('/^(\d+)x(.+)$/', $item, $matches)) {
+                        $qty = (int)$matches[1];
+                        $cType = trim($matches[2]); 
+                        
+                        // Nếu loại Cont này có tồn tại trong danh sách thì cộng dồn
+                        if (array_key_exists($cType, $summary[$type])) {
+                            $summary[$type][$cType] += $qty;
+                            $summary[$type]['tong'] += $qty;
+                        }
+                    }
+                }
+            }
         }
 
         require_once 'app/Views/orders/index.php';
@@ -116,46 +152,68 @@ class OrderController {
     }
 
     public function edit() {
-        if (!isset($_GET['id'])) {
-            header("Location: index.php?page=orders");
-            exit();
-        }
-        $id = $_GET['id'];
-
-        // Nếu người dùng bấm nút "LƯU THAY ĐỔI" (gửi form bằng phương thức POST)
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Lấy dữ liệu từ Form gửi lên
-            $order_code = $_POST['order_code'];
-            $creator_name = $_POST['creator_name'];
-            $action_type = $_POST['action_type'];
-            $depot_name = $_POST['depot_name'];
-            $shipping_line = $_POST['shipping_line'];
-            $qty_20 = (int)$_POST['qty_20'];
-            $qty_40 = (int)$_POST['qty_40'];
-            $qty_45 = (int)$_POST['qty_45'];
-            $note = $_POST['note'];
-
-            // Chạy lệnh UPDATE
-            $stmt = $this->pdo->prepare("UPDATE logis_orders SET order_code=?, creator_name=?, action_type=?, depot_name=?, shipping_line=?, qty_20=?, qty_40=?, qty_45=?, note=? WHERE id=?");
-            $stmt->execute([$order_code, $creator_name, $action_type, $depot_name, $shipping_line, $qty_20, $qty_40, $qty_45, $note, $id]);
-
-            // Cập nhật xong thì quay về trang danh sách
-            header("Location: index.php?page=orders");
-            exit();
-        }
-
-        // Nếu là click bình thường (phương thức GET) -> Lấy dữ liệu cũ ra để điền vào Form
+        $id = $_GET['id'] ?? 0;
+        
+        // 1. Lấy thông tin chung của đơn hàng
         $stmt = $this->pdo->prepare("SELECT * FROM logis_orders WHERE id = ?");
         $stmt->execute([$id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
-
+        
         if (!$order) {
-            header("Location: index.php?page=orders");
-            exit();
+            die("Không tìm thấy đơn hàng.");
         }
-
-        // Gọi giao diện Form sửa và truyền dữ liệu $order sang
+        
+        // 2. Lấy chi tiết các loại Cont của đơn hàng này từ bảng logis_order_details
+        $stmtDetails = $this->pdo->prepare("SELECT * FROM logis_order_details WHERE order_id = ?");
+        $stmtDetails->execute([$id]);
+        $orderDetails = $stmtDetails->fetchAll(PDO::FETCH_ASSOC);
+        
+        // 3. Lấy danh sách 14 loại Cont từ bảng biểu giá để đổ vào thẻ <select>
+        $stmtPricing = $this->pdo->query("SELECT * FROM logis_pricing ORDER BY id ASC");
+        $pricings = $stmtPricing->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Gọi ra View Edit
         require_once 'app/Views/orders/edit.php';
+    }
+
+    // BẠN DÁN HÀM UPDATE NÀY NGAY BÊN DƯỚI HÀM EDIT NHÉ
+    public function update() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'];
+            
+            // 1. Cập nhật bảng chính (logis_orders)
+            $stmt = $this->pdo->prepare("UPDATE logis_orders SET creator_name=?, action_type=?, depot_name=?, shipping_line=?, bl_do_bkg=?, note=?, status=? WHERE id=?");
+            $stmt->execute([
+                $_POST['creator_name'], 
+                $_POST['action_type'], 
+                $_POST['depot_name'], 
+                $_POST['shipping_line'], 
+                $_POST['bl_do_bkg'], 
+                $_POST['note'], 
+                $_POST['status'],
+                $id
+            ]);
+            
+            // 2. Xóa toàn bộ chi tiết Cont cũ của đơn này trong bảng logis_order_details
+            $stmtDel = $this->pdo->prepare("DELETE FROM logis_order_details WHERE order_id = ?");
+            $stmtDel->execute([$id]);
+            
+            // 3. Insert lại danh sách Cont mới từ Form gửi lên (từ Mảng containers)
+            if (isset($_POST['containers']) && is_array($_POST['containers'])) {
+                $stmtInsert = $this->pdo->prepare("INSERT INTO logis_order_details (order_id, pricing_id, quantity) VALUES (?, ?, ?)");
+                foreach ($_POST['containers'] as $container) {
+                    // Chỉ lưu nếu có ID bảng giá và số lượng > 0
+                    if (!empty($container['pricing_id']) && !empty($container['quantity']) && $container['quantity'] > 0) {
+                        $stmtInsert->execute([$id, $container['pricing_id'], $container['quantity']]);
+                    }
+                }
+            }
+            
+            // Báo thành công và quay về trang danh sách
+            $_SESSION['success_msg'] = "Đã cập nhật đơn hàng thành công!";
+            header("Location: index.php?page=orders");
+            exit;
+        }
     }
 
     public function download() {
