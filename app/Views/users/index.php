@@ -151,4 +151,76 @@ require_once 'app/Views/layouts/header.php';
     }
 </style>
 
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header text-white" style="background-color: #0284c7;">
+                <h6 class="modal-title fw-bold" id="addUserModalLabel"><i class="fas fa-user-plus me-2"></i>Tạo tài khoản hệ thống</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="<?= $baseUrl ?>/index.php?page=users" method="POST">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label text-muted small fw-bold">Họ và tên người dùng <span class="text-danger">*</span></label>
+                            <input type="text" name="full_name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">Tên đăng nhập (Username) <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" placeholder="Nhập tên đăng nhập" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">Mật khẩu <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="email@tancang.vn">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">Số điện thoại</label>
+                            <input type="text" name="phone" class="form-control" placeholder="09xx xxx xxx">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-muted small fw-bold">Cấp quyền (Vai trò) <span class="text-danger">*</span></label>
+                            <select name="role_id" class="form-select" required>
+                                <option value="" disabled selected>-- Chọn nhóm quyền --</option>
+                                <option value="1">Quản trị viên (Admin)</option>
+                                <option value="2">Nhân viên Điều độ</option>
+                                <option value="3">Thương vụ</option>
+                                <option value="4">Khách hàng / Nhà xe</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm"><i class="fas fa-check me-1"></i> Xác nhận tạo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php if(isset($_GET['msg']) && $_GET['msg'] == 'success'): ?>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        alert("🎉 Đã tạo tài khoản thành công!");
+        // Làm sạch URL sau khi thông báo để F5 không bị lặp lại
+        window.history.pushState({}, document.title, window.location.pathname + "?page=users");
+    });
+</script>
+<?php endif; ?>
+
+<?php if(isset($error_msg)): ?>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        alert("❌ Lỗi: <?= $error_msg ?>");
+    });
+</script>
+<?php endif; ?>
+
 <?php require_once 'app/Views/layouts/footer.php'; ?>
