@@ -52,19 +52,28 @@
             </div>
             <div class="topbar-right">
             <div class="icon-wrapper dropdown">
-                <div data-bs-toggle="dropdown" style="cursor: pointer;">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge-noti" id="notiCount" style="display: none;">0</span>
-            </div>
-            <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" id="notiDrop" style="width: 350px; max-height: 450px; overflow-y: auto;">
-                <h6 class="dropdown-header bg-light py-3 fw-bold border-bottom">THÔNG BÁO HỆ THỐNG</h6>
-                <div id="notiList">
-                    <div class="text-center p-4 text-muted small">Đang tải dữ liệu...</div>
-            </div>
-        </div>
+    <div data-bs-toggle="dropdown" style="cursor: pointer;">
+        <i class="fas fa-bell"></i>
+        <span class="badge-noti" id="notiCount" style="display: none;">0</span>
     </div>
     
-
+    <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" id="notiDrop" style="width: 350px;">
+        <h6 class="dropdown-header bg-light py-3 fw-bold border-bottom">THÔNG BÁO HỆ THỐNG</h6>
+        
+        <div id="notiList" style="max-height: 350px; overflow-y: auto;">
+            <div class="text-center p-4 text-muted small">Đang tải dữ liệu...</div>
+        </div>
+        
+        <div class="p-2 border-top d-flex justify-content-between bg-light">
+            <button class="btn btn-sm btn-link text-decoration-none fw-bold" style="color: #0284c7; font-size: 13px;" onclick="markAllRead(event)">
+                <i class="fas fa-check-double me-1"></i> Đã đọc hết
+            </button>
+            <button class="btn btn-sm btn-link text-decoration-none text-danger fw-bold" style="font-size: 13px;" onclick="deleteAllNoti(event)">
+                <i class="fas fa-trash-alt me-1"></i> Xóa tất cả
+            </button>
+        </div>
+    </div>
+</div>
 
                 <div class="user-profile dropdown">
                     <img src="https://ui-avatars.com/api/?name=Admin&background=fff&color=0284c7" alt="Avatar" class="rounded-circle me-2" width="35">
