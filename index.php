@@ -1,11 +1,26 @@
 <?php
 // 0 có nghĩa là cookie chỉ tồn tại trong phiên làm việc hiện tại
-session_set_cookie_params(0, '/TanCang/'); 
+session_set_cookie_params(0, '/'); 
 
 // 2. Thiết lập thời gian tự động đăng xuất sau 10 phút nếu không thao tác (tăng tính chuyên nghiệp)
 ini_set('session.gc_maxlifetime', 600);
 
 session_start();
+
+if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) {
+    // Nếu đã lưu thời gian hoạt động cuối, và thời gian đó cách hiện tại quá 10 phút (600 giây)
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 600)) {
+        // Hủy toàn bộ phiên đăng nhập
+        session_unset();     
+        session_destroy();   
+        
+        // Chuyển hướng người dùng về trang đăng nhập với thông báo
+        header("Location: index.php?timeout=1"); 
+        exit();
+    }
+    // Nếu vẫn đang thao tác, cập nhật lại mốc thời gian hoạt động thành hiện tại
+    $_SESSION['last_activity'] = time(); 
+}
 
 // Bật thông báo lỗi
 ini_set('display_errors', 1);
