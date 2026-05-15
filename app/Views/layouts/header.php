@@ -40,7 +40,9 @@
                 <a href="#" class="ps-4"><i class="fas fa-warehouse"></i> Danh mục Depot</a>
                 <a href="#" class="ps-4"><i class="fas fa-anchor"></i> Hãng tàu & Biểu phí</a>
             </div>
-            <a href="#"><i class="fas fa-users-cog"></i> Quản trị Tài khoản</a>
+            <a href="<?= $baseUrl ?>/index.php?page=users" class="<?= ($currentPage == 'users') ? 'active' : '' ?>">
+    <i class="fas fa-users-cog"></i> Quản trị Tài khoản
+</a>
             <a href="#"><i class="fas fa-file-excel"></i> Báo cáo & Thống kê</a>
         </div>
     </aside>

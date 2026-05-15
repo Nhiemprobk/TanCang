@@ -98,7 +98,13 @@ switch ($page) {
         $orderController = new OrderController();
         $orderController->rejectOldPrice();
         break;
-
+  
+        case 'users':
+        require_once 'app/Controllers/UserController.php';
+        $userCtrl = new UserController();
+        $userCtrl->index();
+        break;
+        
     default:
         echo "404 - Trang không tồn tại";
         break;
