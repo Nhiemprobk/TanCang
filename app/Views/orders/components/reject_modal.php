@@ -39,3 +39,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rejectModal = document.getElementById('rejectOldPriceModal');
+        if (rejectModal) {
+            // "Bốc" modal ra khỏi các thẻ div bọc ngoài và ném thẳng vào <body>
+            document.body.appendChild(rejectModal);
+        }
+    });
+</script>

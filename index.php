@@ -99,7 +99,7 @@ switch ($page) {
         $orderController->rejectOldPrice();
         break;
   
-        case 'users':
+    case 'users':
         require_once 'app/Controllers/UserController.php';
         $userCtrl = new UserController();
         $userCtrl->index();
