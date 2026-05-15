@@ -23,6 +23,8 @@
     <form action="index.php" method="GET" class="row g-2 align-items-end">
         
         <input type="hidden" name="page" value="orders">
+
+        <input type="hidden" name="limit" value="<?= $limit ?>">
         
         <?php if(isset($_GET['status'])): ?>
             <input type="hidden" name="status" value="<?= htmlspecialchars($_GET['status']) ?>">
@@ -30,11 +32,11 @@
 
         <div class="col-md-2">
             <label class="form-label small fw-bold text-muted">Từ ngày: </label>
-            <input type="date" class="form-control form-control-sm">
+            <input type="date" name="from_date" class="form-control form-control-sm" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
         </div>
         <div class="col-md-2">
             <label class="form-label small fw-bold text-muted">Đến ngày: </label>
-            <input type="date" class="form-control form-control-sm">
+            <input type="date" name="to_date" class="form-control form-control-sm" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
         </div>
         
         <div class="col-md-4">
@@ -60,24 +62,36 @@
 <div class="dash-card p-3 mb-4">
     
     <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-        <?php $stt = $_GET['status'] ?? 'all'; ?>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=all" class="btn btn-sm rounded-pill px-3 <?= $stt == 'all' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Tất cả</a>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=cho_duyet" class="btn btn-sm rounded-pill px-3 <?= $stt == 'cho_duyet' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Chờ duyệt (<?= $counts['Chờ duyệt'] ?? 0 ?>)</a>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=tu_choi" class="btn btn-sm rounded-pill px-3 <?= $stt == 'tu_choi' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Duyệt từ chối (<?= $counts['Duyệt từ chối'] ?? 0 ?>)</a>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=dong_y" class="btn btn-sm rounded-pill px-3 <?= $stt == 'dong_y' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Duyệt đồng ý (<?= $counts['Duyệt đồng ý'] ?? 0 ?>)</a>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=da_thanh_toan" class="btn btn-sm rounded-pill px-3 <?= $stt == 'da_thanh_toan' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Đã thanh toán (<?= $counts['Đã thanh toán'] ?? 0 ?>)</a>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=dang_lam_hang" class="btn btn-sm rounded-pill px-3 <?= $stt == 'dang_lam_hang' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Đang làm hàng (<?= $counts['Đang làm hàng'] ?? 0 ?>)</a>
-        
-        <a href="<?= $baseUrl ?>/index.php?page=orders&status=hoan_thanh" class="btn btn-sm rounded-pill px-3 <?= $stt == 'hoan_thanh' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" style="height: 31px; display: inline-flex; align-items: center;">Hoàn thành (<?= $counts['Hoàn thành'] ?? 0 ?>)</a>
-        
-        <button class="btn btn-danger btn-sm rounded-pill px-3 ms-auto d-flex align-items-center" style="height: 31px;"><i class="fas fa-times-circle me-1"></i> Từ chối đơn giá cũ</button>
-    </div>
+    <?php $stt = $_GET['status'] ?? 'all'; ?>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=all&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= ($stt == 'all' && empty($_GET['search_text'])) ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Tất cả</a>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=cho_duyet&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= $stt == 'cho_duyet' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Chờ duyệt (<?= $counts['Chờ duyệt'] ?? 0 ?>)</a>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=tu_choi&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= $stt == 'tu_choi' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Duyệt từ chối (<?= $counts['Duyệt từ chối'] ?? 0 ?>)</a>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=dong_y&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= $stt == 'dong_y' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Duyệt đồng ý (<?= $counts['Duyệt đồng ý'] ?? 0 ?>)</a>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=da_thanh_toan&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= $stt == 'da_thanh_toan' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Đã thanh toán (<?= $counts['Đã thanh toán'] ?? 0 ?>)</a>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=dang_lam_hang&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= $stt == 'dang_lam_hang' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Đang làm hàng (<?= $counts['Đang làm hàng'] ?? 0 ?>)</a>
+    
+    <a href="<?= $baseUrl ?>/index.php?page=orders&status=hoan_thanh&limit=<?= $limit ?>" 
+       class="btn btn-sm rounded-pill px-3 <?= $stt == 'hoan_thanh' ? 'btn-primary fw-bold' : 'btn-outline-secondary' ?>" 
+       style="height: 31px; display: inline-flex; align-items: center;">Hoàn thành (<?= $counts['Hoàn thành'] ?? 0 ?>)</a>
+</div>
 
     <div class="table-responsive table-scrollable border rounded">
         <table class="table table-sm table-compact table-hover table-striped text-center align-middle text-nowrap mb-0" style="font-size: 13px;">

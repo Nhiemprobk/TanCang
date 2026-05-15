@@ -18,11 +18,15 @@ class OrderController {
         $search_text = trim($_GET['search_text'] ?? '');
         $search_type = $_GET['search_type'] ?? 'all';
         
+        // Bắt thêm 2 tham số ngày tháng
+        $from_date = $_GET['from_date'] ?? '';
+        $to_date = $_GET['to_date'] ?? '';
+        
         // Tham số phân trang
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10; // Số dòng trên 1 trang
-        $p = isset($_GET['p']) ? (int)$_GET['p'] : 1;             // Trang hiện tại
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $p = isset($_GET['p']) ? (int)$_GET['p'] : 1;
         if ($p < 1) $p = 1;
-        $offset = ($p - 1) * $limit; // Vị trí bắt đầu lấy dữ liệu
+        $offset = ($p - 1) * $limit;
 
         $status_map = [
             'cho_duyet' => 'Chờ duyệt', 'tu_choi' => 'Duyệt từ chối', 'dong_y' => 'Duyệt đồng ý',
@@ -30,13 +34,27 @@ class OrderController {
             'hoan_thanh' => 'Hoàn thành', 'cho_dung_don' => 'Chờ dừng đơn'
         ];
 
-        // 2. XÂY DỰNG ĐIỀU KIỆN WHERE (Dùng chung cho cả đếm tổng và lấy dữ liệu)
+        // 2. XÂY DỰNG ĐIỀU KIỆN WHERE
         $where = " WHERE 1=1";
         $params = [];
+        
+        // Lọc theo Trạng thái
         if ($current_status !== 'all' && isset($status_map[$current_status])) {
             $where .= " AND status = ?";
             $params[] = $status_map[$current_status];
         }
+        
+        // LỌC THEO NGÀY THÁNG (Sử dụng DATE() để chỉ lấy ngày, bỏ qua giờ phút giây trong DB)
+        if (!empty($from_date)) {
+            $where .= " AND DATE(created_at) >= ?";
+            $params[] = $from_date;
+        }
+        if (!empty($to_date)) {
+            $where .= " AND DATE(created_at) <= ?";
+            $params[] = $to_date;
+        }
+
+        // Lọc theo Từ khóa
         if (!empty($search_text)) {
             if ($search_type === 'order_code') {
                 $where .= " AND order_code LIKE ?"; $params[] = "%$search_text%";
