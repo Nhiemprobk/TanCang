@@ -123,7 +123,13 @@ switch ($page) {
         $orderController = new OrderController();
         $orderController->update();
         break;
-
+    
+    case 'change_status':
+        require_once 'app/Controllers/OrderController.php';
+        $orderController = new OrderController();
+        $orderController->changeStatus();
+        break;
+        
     default:
         echo "404 - Trang không tồn tại";
         break;

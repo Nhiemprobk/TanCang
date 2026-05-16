@@ -29,6 +29,21 @@
                 <tr>
                     <td class="border-end"><?= $index + 1 ?></td>
                     <td class="border-end text-nowrap">
+                        <?php if($row['status'] == 'Chờ duyệt'): ?>
+                            <a href="<?= $baseUrl ?>/index.php?page=change_status&id=<?= $row['id'] ?>&action=approve" class="btn btn-sm btn-success rounded-circle d-inline-flex justify-content-center align-items-center mb-1" title="Duyệt đồng ý" style="width:28px; height:28px;" onclick="return confirm('Xác nhận duyệt đơn hàng này?');">
+                                <i class="fas fa-check" style="font-size: 12px;"></i>
+                            </a>
+                            <a href="<?= $baseUrl ?>/index.php?page=change_status&id=<?= $row['id'] ?>&action=reject" class="btn btn-sm btn-warning text-dark rounded-circle d-inline-flex justify-content-center align-items-center mb-1 mx-1" title="Từ chối" style="width:28px; height:28px;" onclick="return confirm('Xác nhận từ chối đơn này?');">
+                                <i class="fas fa-times" style="font-size: 12px;"></i>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if(in_array($row['status'], ['Duyệt đồng ý', 'Đang làm hàng', 'Đã thanh toán'])): ?>
+                            <a href="<?= $baseUrl ?>/index.php?page=change_status&id=<?= $row['id'] ?>&action=complete" class="btn btn-sm btn-info text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-1 me-1" title="Xác nhận Hoàn thành" style="width:28px; height:28px;" onclick="return confirm('Xác nhận Cont đã qua cổng và Hoàn thành lệnh?');">
+                                <i class="fas fa-flag-checkered" style="font-size: 12px;"></i>
+                            </a>
+                        <?php endif; ?>
+
                         <a href="<?= $baseUrl ?>/index.php?page=edit_order&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-primary rounded-circle d-inline-flex justify-content-center align-items-center" title="Sửa" style="width:28px; height:28px;">
                             <i class="fas fa-edit" style="font-size: 12px;"></i>
                         </a>

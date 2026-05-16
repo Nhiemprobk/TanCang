@@ -366,5 +366,47 @@ class OrderController {
         header("Location: index.php?page=orders&status=tu_choi");
         exit();
     }
+
+    public function changeStatus() {
+        if (!isset($_GET['id']) || !isset($_GET['action'])) {
+            header("Location: index.php?page=orders");
+            exit();
+        }
+
+        $id = $_GET['id'];
+        $action = $_GET['action'];
+        
+        // Tự động lấy giờ hiện tại của hệ thống
+        $current_time = date('Y-m-d H:i:s');
+        // Lấy tên người đang đăng nhập (hoặc để mặc định là Admin)
+        $user_name = $_SESSION['username'] ?? 'Admin'; 
+
+        if ($action === 'approve') {
+            // Nếu Duyệt: Đổi trạng thái, ghi lại ngày duyệt và người duyệt
+            $sql = "UPDATE logis_orders SET status = 'Duyệt đồng ý', approval_date = ?, approver_name = ? WHERE id = ?";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$current_time, $user_name, $id]);
+            $_SESSION['success_msg'] = "Đã duyệt đơn hàng thành công!";
+            
+        } elseif ($action === 'reject') {
+            // Nếu Từ chối: Đổi trạng thái, ghi lại ngày duyệt và người duyệt
+            $sql = "UPDATE logis_orders SET status = 'Duyệt từ chối', approval_date = ?, approver_name = ? WHERE id = ?";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$current_time, $user_name, $id]);
+            $_SESSION['success_msg'] = "Đã từ chối đơn hàng!";
+            
+        } elseif ($action === 'complete') {
+            // Nếu Hoàn thành: Đổi trạng thái, ghi lại ngày hoàn thành
+            $sql = "UPDATE logis_orders SET status = 'Hoàn thành', completion_date = ? WHERE id = ?";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$current_time, $id]);
+            $_SESSION['success_msg'] = "Xác nhận đơn hàng đã hoàn tất!";
+        }
+
+        // Tự động quay lại trang cũ (để giữ nguyên trạng thái tìm kiếm/phân trang)
+        $referer = $_SERVER['HTTP_REFERER'] ?? "index.php?page=orders";
+        header("Location: " . $referer);
+        exit();
+    }
 }
 ?>
