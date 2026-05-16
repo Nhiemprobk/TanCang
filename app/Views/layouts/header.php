@@ -92,3 +92,19 @@
         </header>
 
         <main class="content-wrapper">
+            <?php if(isset($_SESSION['success_msg']) || isset($_SESSION['error_msg'])): ?>
+                <div class="container-fluid px-4 py-3">
+                    <?php if(isset($_SESSION['success_msg'])): ?>
+                        <div class="alert alert-success alert-dismissible fade show small fw-bold" role="alert">
+                            <i class="fas fa-check-circle me-1"></i> <?= $_SESSION['success_msg']; unset($_SESSION['success_msg']); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+                    <?php if(isset($_SESSION['error_msg'])): ?>
+                        <div class="alert alert-danger alert-dismissible fade show small fw-bold" role="alert">
+                            <i class="fas fa-exclamation-triangle me-1"></i> <?= $_SESSION['error_msg']; unset($_SESSION['error_msg']); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
