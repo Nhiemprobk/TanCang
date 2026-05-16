@@ -52,7 +52,11 @@
                             <i class="fas fa-trash-alt" style="font-size: 12px;"></i>
                         </a>
 
-                        <a href="<?= $baseUrl ?>/index.php?page=download_order&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-success rounded-circle d-inline-flex justify-content-center align-items-center" title="Tải xuống" style="width:28px; height:28px;">
+                       <a href="<?= $baseUrl ?>/index.php?page=export&action=order&id=<?= $row['id'] ?>" 
+                        class="btn btn-sm btn-outline-success rounded-circle d-inline-flex justify-content-center align-items-center" 
+                        title="Tải xuống" 
+                        style="width:28px; height:28px;" 
+                        target="_blank">
                             <i class="fas fa-download" style="font-size: 12px;"></i>
                         </a>
                     </td>
