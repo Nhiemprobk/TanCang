@@ -32,19 +32,19 @@
             <a href="<?= $baseUrl ?>/index.php?page=orders" class="<?= ($currentPage == 'orders') ? 'active' : '' ?>">
                 <i class="fas fa-clipboard-check"></i> Tiếp nhận lệnh / Đơn hàng
             </a>
-            
-            <li class="nav-item mb-2">
-              <a href="<?= $baseUrl ?>/index.php?page=pricing" class="nav-link <?= (isset($_GET['page']) && $_GET['page'] == 'pricing') ? 'active bg-primary text-white' : 'text-dark' ?> px-3 py-2 rounded-3 fw-medium d-flex align-items-center">
-                <i class="fas fa-tags me-3 <?= (isset($_GET['page']) && $_GET['page'] == 'pricing') ? 'text-white' : 'text-primary' ?> fs-5"></i>
-                 <span>Biểu giá dịch vụ</span>
-              </a>
-            </li>
-            
-            <p class="menu-label mt-3">HỆ THỐNG</p>
-            
+            <a href="<?= $baseUrl ?>/index.php?page=pricing" class="<?= ($currentPage == 'pricing') ? 'active' : '' ?>">
+                <i class="fas fa-tags"></i> Biểu giá dịch vụ
+            </a>
+
+            <p class="menu-label mt-3">QUẢN TRỊ HỆ THỐNG</p>
             <a href="<?= $baseUrl ?>/index.php?page=users" class="<?= ($currentPage == 'users') ? 'active' : '' ?>">
-    <i class="fas fa-users-cog"></i> Quản trị Tài khoản
-</a>
+                <i class="fas fa-users-cog"></i> Tài khoản nhân sự
+            </a>
+            <a href="<?= $baseUrl ?>/index.php?page=roles" class="<?= ($currentPage == 'roles') ? 'active' : '' ?>">
+                <i class="fas fa-user-shield"></i> Nhóm Quyền (Roles)
+            </a>
+
+            <p class="menu-label mt-3">HỆ THỐNG</p>
             <a href="#"><i class="fas fa-file-excel"></i> Báo cáo & Thống kê</a>
         </div>
     </aside>

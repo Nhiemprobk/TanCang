@@ -28,6 +28,9 @@ class AuthController {
             $_SESSION['username'] = 'admin';
             $_SESSION['role'] = 'Admin';
             
+            //  Lấy level từ bảng Roles
+            $_SESSION['role_level'] = (int)$user['level'];
+
             // Chuyển hướng vào trang chủ hệ thống
             header("Location: index.php?page=home");
             exit();

@@ -10,6 +10,10 @@ class UserController {
     }
 
     public function index() {
+        if (($_SESSION['role_level'] ?? 4) > 2) {
+            header("Location: index.php?page=orders");
+            exit();
+        }
         // ==========================================================
         // 1. XỬ LÝ CÁC HÀNH ĐỘNG GET (KHÓA/MỞ KHÓA, XÓA)
         // ==========================================================

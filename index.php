@@ -132,6 +132,18 @@ switch ($page) {
         $orderController->changeStatus();
         break;
 
+    // --- QUẢN LÝ PHÂN QUYỀN ---
+    case 'roles':
+        require_once 'app/Controllers/RoleController.php';
+        $roleController = new RoleController();
+        $roleController->index();
+        break;
+    case 'store_role':
+        require_once 'app/Controllers/RoleController.php';
+        $roleController = new RoleController();
+        $roleController->store();
+        break;
+
     default:
         echo "404 - Trang không tồn tại";
         break;

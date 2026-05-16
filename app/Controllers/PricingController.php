@@ -10,6 +10,10 @@ class PricingController {
 
     // Hiển thị giao diện cài đặt giá
     public function index() {
+        if (($_SESSION['role_level'] ?? 4) > 2) {
+            header("Location: index.php?page=orders");
+            exit();
+        }
         $stmt = $this->pdo->query("SELECT * FROM logis_pricing ORDER BY container_type ASC");
         $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         

@@ -18,6 +18,10 @@ class OrderController {
     }
 
     public function index() {
+        if (($_SESSION['role_level'] ?? 4) > 3) {
+            header("Location: index.php?page=orders");
+            exit();
+        }
         // 1. LẤY CÁC THAM SỐ TỪ URL
         $current_status = $_GET['status'] ?? 'all';
         $search_text = trim($_GET['search_text'] ?? '');
