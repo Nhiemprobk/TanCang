@@ -4,96 +4,21 @@ class UserController {
     private $pdo;
 
     public function __construct() {
-        global $pdo;
-        require_once 'config/database.php';
+        require 'config/database.php';
         $this->pdo = $pdo;
     }
 
     public function index() {
-        if (($_SESSION['role_level'] ?? 4) > 2) {
-            header("Location: index.php?page=orders");
-            exit();
-        }
-        // ==========================================================
-        // 1. XỬ LÝ CÁC HÀNH ĐỘNG GET (KHÓA/MỞ KHÓA, XÓA)
-        // ==========================================================
-        if (isset($_GET['action']) && isset($_GET['id'])) {
-            $action = $_GET['action'];
-            $id = (int)$_GET['id'];
-
-            if ($action == 'toggle_status') {
-                // Đảo ngược trạng thái is_active (1 thành 0, 0 thành 1)
-                $stmt = $this->pdo->prepare("UPDATE users SET is_active = NOT is_active WHERE id = ?");
-                $stmt->execute([$id]);
-                header("Location: index.php?page=users&msg=status_changed");
-                exit;
-            }
-
-            if ($action == 'delete') {
-                // Xóa vĩnh viễn
-                $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
-                $stmt->execute([$id]);
-                header("Location: index.php?page=users&msg=deleted");
-                exit;
-            }
-        }
-
-        // ==========================================================
-        // 2. XỬ LÝ CÁC HÀNH ĐỘNG POST (THÊM, SỬA, ĐỔI MẬT KHẨU)
-        // ==========================================================
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-            $action = $_POST['action'];
-
-            if ($action == 'add') {
-                $username = trim($_POST['username']);
-                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $full_name = trim($_POST['full_name']);
-                $email = trim($_POST['email']);
-                $phone = trim($_POST['phone']);
-                $role_id = $_POST['role_id'];
-
-                try {
-                    $sql = "INSERT INTO users (username, password, full_name, email, phone, role_id, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)";
-                    $stmt = $this->pdo->prepare($sql);
-                    $stmt->execute([$username, $password, $full_name, $email, $phone, $role_id]);
-                    header("Location: index.php?page=users&msg=added");
-                    exit;
-                } catch(PDOException $e) {
-                    $error_msg = "Tên đăng nhập đã tồn tại!";
-                }
-            }
-
-            if ($action == 'edit') {
-                $id = $_POST['id'];
-                $full_name = trim($_POST['full_name']);
-                $email = trim($_POST['email']);
-                $phone = trim($_POST['phone']);
-                $role_id = $_POST['role_id'];
-
-                $sql = "UPDATE users SET full_name=?, email=?, phone=?, role_id=? WHERE id=?";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([$full_name, $email, $phone, $role_id, $id]);
-                header("Location: index.php?page=users&msg=edited");
-                exit;
-            }
-
-            if ($action == 'reset_password') {
-                $id = $_POST['id'];
-                $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
-
-                $sql = "UPDATE users SET password=? WHERE id=?";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([$new_password, $id]);
-                header("Location: index.php?page=users&msg=password_reset");
-                exit;
-            }
-        }
-
-        // ==========================================================
-        // 3. LẤY DỮ LIỆU VÀ THỐNG KÊ (GIỮ NGUYÊN)
-        // ==========================================================
-        $stmt = $this->pdo->query("SELECT u.*, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id ORDER BY u.id DESC");
+        // Lấy danh sách user kèm theo tên quyền
+        $stmt = $this->pdo->query("SELECT u.*, r.role_name as role_name 
+                                   FROM users u 
+                                   LEFT JOIN Roles r ON u.role_id = r.id 
+                                   ORDER BY u.id DESC");
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // LẤY DANH SÁCH QUYỀN TỪ DB ĐỂ ĐỔ VÀO POPUP THÊM/SỬA
+        $stmtRoles = $this->pdo->query("SELECT id, role_name FROM Roles ORDER BY level ASC");
+        $allRoles = $stmtRoles->fetchAll(PDO::FETCH_ASSOC);
 
         $stats = [
             'total' => count($users),
@@ -103,5 +28,70 @@ class UserController {
 
         require 'app/Views/users/index.php';
     }
+
+    public function store() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = trim($_POST['username']);
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $full_name = trim($_POST['full_name']);
+            $email = trim($_POST['email']);
+            $phone = trim($_POST['phone']);
+            $role_id = $_POST['role_id'];
+
+            try {
+                $stmt = $this->pdo->prepare("INSERT INTO users (username, password, full_name, email, phone, role_id, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)");
+                $stmt->execute([$username, $password, $full_name, $email, $phone, $role_id]);
+                $_SESSION['success_msg'] = "Thêm tài khoản thành công!";
+            } catch (PDOException $e) {
+                $_SESSION['error_msg'] = "Tên đăng nhập hoặc email đã tồn tại!";
+            }
+            header("Location: index.php?page=users");
+            exit();
+        }
+    }
+
+    public function update() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'];
+            $full_name = trim($_POST['full_name']);
+            $email = trim($_POST['email']);
+            $phone = trim($_POST['phone']);
+            $role_id = $_POST['role_id'];
+
+            $stmt = $this->pdo->prepare("UPDATE users SET full_name = ?, email = ?, phone = ?, role_id = ? WHERE id = ?");
+            $stmt->execute([$full_name, $email, $phone, $role_id, $id]);
+            
+            $_SESSION['success_msg'] = "Cập nhật thông tin thành công!";
+            header("Location: index.php?page=users");
+            exit();
+        }
+    }
+
+    public function resetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'];
+            $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+
+            $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $stmt->execute([$new_password, $id]);
+
+            $_SESSION['success_msg'] = "Khôi phục mật khẩu thành công!";
+            header("Location: index.php?page=users");
+            exit();
+        }
+    }
+
+    public function toggleStatus() {
+        if (isset($_GET['id']) && isset($_GET['status'])) {
+            $id = $_GET['id'];
+            $status = $_GET['status'];
+
+            $stmt = $this->pdo->prepare("UPDATE users SET is_active = ? WHERE id = ?");
+            $stmt->execute([$status, $id]);
+
+            $_SESSION['success_msg'] = "Cập nhật trạng thái thành công!";
+            header("Location: index.php?page=users");
+            exit();
+        }
+    }
 }
-?>

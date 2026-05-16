@@ -131,11 +131,13 @@ switch ($page) {
         $roleController = new RoleController();
         $roleController->index();
         break;
+        
     case 'store_role':
         require_once 'app/Controllers/RoleController.php';
         $roleController = new RoleController();
         $roleController->store();
         break;
+
     case 'export':
         require_once 'config/database.php';
         require_once __DIR__ . '/app/Export/BaseExport.php';
@@ -147,6 +149,19 @@ switch ($page) {
         if ($action === 'order') {
             $controller->order();
         }
+
+    case 'store_user':
+        require_once 'app/Controllers/UserController.php';
+        $userController = new UserController();
+        $userController->store();
+        break;
+        
+    case 'update_user':
+        require_once 'app/Controllers/UserController.php';
+        $userController = new UserController();
+        $userController->update();
+        break;
+
     default:
         echo "404 - Trang không tồn tại";
         break;
