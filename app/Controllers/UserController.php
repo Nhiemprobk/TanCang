@@ -32,20 +32,28 @@ class UserController {
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = trim($_POST['username']);
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $passwordInput = $_POST['password'];
+            $confirmPassword = $_POST['confirm_password'] ?? '';
             $full_name = trim($_POST['full_name']);
             $email = trim($_POST['email']);
             $phone = trim($_POST['phone']);
             $role_id = $_POST['role_id'];
 
+            if ($passwordInput !== $confirmPassword) {
+                header("Location: index.php?page=users&msg=password_mismatch");
+                exit();
+            }
+
+            $password = password_hash($passwordInput, PASSWORD_DEFAULT);
+
             try {
                 $stmt = $this->pdo->prepare("INSERT INTO users (username, password, full_name, email, phone, role_id, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)");
                 $stmt->execute([$username, $password, $full_name, $email, $phone, $role_id]);
-                $_SESSION['success_msg'] = "Thêm tài khoản thành công!";
             } catch (PDOException $e) {
-                $_SESSION['error_msg'] = "Tên đăng nhập hoặc email đã tồn tại!";
+                header("Location: index.php?page=users&msg=user_exists");
+                exit();
             }
-            header("Location: index.php?page=users");
+            header("Location: index.php?page=users&msg=added");
             exit();
         }
     }
@@ -82,16 +90,32 @@ class UserController {
     }
 
     public function toggleStatus() {
-        if (isset($_GET['id']) && isset($_GET['status'])) {
+        if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            $status = $_GET['status'];
+            $stmt = $this->pdo->prepare("SELECT is_active FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $stmt = $this->pdo->prepare("UPDATE users SET is_active = ? WHERE id = ?");
-            $stmt->execute([$status, $id]);
+            if ($user !== false) {
+                $newStatus = $user['is_active'] == 1 ? 0 : 1;
+                $stmt = $this->pdo->prepare("UPDATE users SET is_active = ? WHERE id = ?");
+                $stmt->execute([$newStatus, $id]);
 
-            $_SESSION['success_msg'] = "Cập nhật trạng thái thành công!";
-            header("Location: index.php?page=users");
-            exit();
+                $_SESSION['success_msg'] = $newStatus === 1 ? "Mở khóa tài khoản thành công!" : "Khóa tài khoản thành công!";
+            }
         }
+        header("Location: index.php?page=users");
+        exit();
+    }
+
+    public function delete() {
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            $_SESSION['success_msg'] = "Xóa tài khoản vĩnh viễn thành công!";
+        }
+        header("Location: index.php?page=users");
+        exit();
     }
 }

@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <form action="index.php?page=store_user" method="POST"> 
+            <form action="index.php?page=store_user" method="POST" onsubmit="return validateAddUserForm()"> 
                 <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -17,7 +17,11 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Mật khẩu <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control" required>
+                            <input type="password" name="password" id="password" class="form-control" autocomplete="new-password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" autocomplete="new-password" required>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold">Họ và tên <span class="text-danger">*</span></label>

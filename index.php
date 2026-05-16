@@ -100,7 +100,14 @@ switch ($page) {
     case 'users':
         require_once 'app/Controllers/UserController.php';
         $userCtrl = new UserController();
-        $userCtrl->index();
+        $userAction = $_GET['action'] ?? '';
+        if ($userAction === 'toggle_status') {
+            $userCtrl->toggleStatus();
+        } elseif ($userAction === 'delete') {
+            $userCtrl->delete();
+        } else {
+            $userCtrl->index();
+        }
         break;
     
     case 'pricing':
@@ -150,6 +157,7 @@ switch ($page) {
         if ($action === 'order') {
             $controller->order();
         }
+        break;
 
     case 'store_user':
         require_once 'app/Controllers/UserController.php';

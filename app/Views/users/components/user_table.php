@@ -52,7 +52,7 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                                     <li><a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" 
-                                           data-id="<?= $user['id'] ?>" data-fullname="<?= htmlspecialchars($user['full_name']) ?>" 
+                                           data-id="<?= $user['id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>" data-fullname="<?= htmlspecialchars($user['full_name']) ?>" 
                                            data-email="<?= htmlspecialchars($user['email']) ?>" data-phone="<?= htmlspecialchars($user['phone']) ?>" data-role="<?= $user['role_id'] ?>" onclick="fillEditModal(this)">
                                         <i class="fas fa-user-edit me-2 text-primary"></i> Chỉnh sửa hồ sơ
                                     </a></li>
