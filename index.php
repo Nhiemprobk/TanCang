@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+
 // 0 có nghĩa là cookie chỉ tồn tại trong phiên làm việc hiện tại
 session_set_cookie_params(0, '/'); 
 
@@ -129,7 +131,7 @@ switch ($page) {
         $orderController = new OrderController();
         $orderController->changeStatus();
         break;
-        
+
     default:
         echo "404 - Trang không tồn tại";
         break;
