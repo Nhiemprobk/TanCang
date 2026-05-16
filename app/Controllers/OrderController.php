@@ -223,7 +223,7 @@ class OrderController {
         }
         $id = $_GET['id'];
 
-        // Truy vấn CSDL
+        // 1. Lấy thông tin chung của đơn hàng
         $stmt = $this->pdo->prepare("SELECT * FROM logis_orders WHERE id = ?");
         $stmt->execute([$id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -232,21 +232,27 @@ class OrderController {
             die("Không tìm thấy đơn hàng!");
         }
 
-        // 1. Khởi tạo một file Excel mới
+        // 2. LẤY CHI TIẾT CONTAINER ĐỘNG: Lấy chính xác loại cont và số lượng từ DB
+        $stmtDetails = $this->pdo->prepare("
+            SELECT p.container_type, d.quantity 
+            FROM logis_order_details d
+            JOIN logis_pricing p ON d.pricing_id = p.id
+            WHERE d.order_id = ?
+        ");
+        $stmtDetails->execute([$id]);
+        $details = $stmtDetails->fetchAll(PDO::FETCH_ASSOC);
+
+        // Khởi tạo một file Excel mới
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         
-        // 2. Đặt tiêu đề cho Sheet
+        // Đặt tiêu đề cho Sheet
         $sheet->setTitle('Phiếu Đơn Hàng');
 
-        // 3. Ghi dữ liệu vào các ô
-        // Dòng Tiêu đề
+        // Ghi dữ liệu thông tin chung cố định
         $sheet->setCellValue('A1', 'PHIẾU TIẾP NHẬN ĐƠN HÀNG - LOGISPORT');
-        $sheet->mergeCells('A1:B1'); // Gộp ô A1 và B1
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->mergeCells('A1:B1');
 
-        // Các dòng dữ liệu
         $sheet->setCellValue('A3', 'Mã đơn hàng');
         $sheet->setCellValue('B3', $order['order_code']);
 
@@ -270,38 +276,50 @@ class OrderController {
 
         $sheet->setCellValue('A11', 'CHI TIẾT CONTAINER');
         $sheet->mergeCells('A11:B11');
-        $sheet->getStyle('A11')->getFont()->setBold(true);
 
-        $sheet->setCellValue('A12', "Cont 20'");
-        $sheet->setCellValue('B12', $order['qty_20'] . ' cont');
+        // 3. XỬ LÝ ĐỔ DỮ LIỆU CONTAINER THEO DÒNG ĐỘNG
+        // Bắt đầu duyệt từ dòng 12 trở đi, hiển thị đầy đủ tên loại Cont thực tế và đánh số lượng tương ứng
+        $currentRow = 12;
+        if (empty($details)) {
+            $sheet->setCellValue('A' . $currentRow, 'Loại Container');
+            $sheet->setCellValue('B' . $currentRow, '0 cont');
+            $currentRow++;
+        } else {
+            foreach ($details as $d) {
+                $sheet->setCellValue('A' . $currentRow, $d['container_type']);
+                $sheet->setCellValue('B' . $currentRow, $d['quantity'] . ' cont');
+                $currentRow++;
+            }
+        }
 
-        $sheet->setCellValue('A13', "Cont 40'");
-        $sheet->setCellValue('B13', $order['qty_40'] . ' cont');
+        // Ghi chú và Trạng thái tự động dịch chuyển tịnh tiến theo biến $currentRow
+        $sheet->setCellValue('A' . $currentRow, 'Ghi chú');
+        $sheet->setCellValue('B' . $currentRow, $order['note'] ? $order['note'] : 'Không có');
+        $currentRow++;
 
-        $sheet->setCellValue('A14', "Cont 45'");
-        $sheet->setCellValue('B14', $order['qty_45'] . ' cont');
+        $sheet->setCellValue('A' . $currentRow, 'Trạng thái');
+        $sheet->setCellValue('B' . $currentRow, mb_strtoupper($order['status'], 'UTF-8'));
+        $statusRow = $currentRow; // Lưu lại vị trí dòng trạng thái để định dạng màu sắc
 
-        $sheet->setCellValue('A15', 'Ghi chú');
-        $sheet->setCellValue('B15', $order['note'] ? $order['note'] : 'Không có');
+        // 4. THIẾT LẬP STYLE THEO VÙNG DÒNG ĐỘNG (Từ dòng 1 đến $currentRow)
+        $sheet->getStyle('A1:B' . $currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-        $sheet->setCellValue('A16', 'Trạng thái');
-        $sheet->setCellValue('B16', mb_strtoupper($order['status'], 'UTF-8'));
-
-        // 4. Định dạng file cho đẹp       
-        $sheet->getStyle('A1:B16')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
+        // Định dạng tiêu đề lớn của phiếu
         $sheet->getStyle('A1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF3275B2'); 
         $sheet->getStyle('A1')->getFont()->getColor()->setARGB('FFFFFFFF');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+        // Định dạng dải màu xám cho thanh tiêu đề "CHI TIẾT CONTAINER"
         $sheet->getStyle('A11')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFEAECEF');
         $sheet->getStyle('A11')->getFont()->setBold(true);
         $sheet->getStyle('A11')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->getStyle('B16')->getFont()->getColor()->setARGB('FFD32F2F');
-        $sheet->getStyle('B16')->getFont()->setBold(true);
+        // Định dạng nổi bật cho chữ Trạng thái ở dòng cuối cùng
+        $sheet->getStyle('B' . $statusRow)->getFont()->getColor()->setARGB('FFD32F2F');
+        $sheet->getStyle('B' . $statusRow)->getFont()->setBold(true);
 
+        // Kẻ viền (Borders) toàn bộ bảng dữ liệu một cách tự động
         $styleArray = [
             'borders' => [
                 'allBorders' => [
@@ -310,23 +328,28 @@ class OrderController {
                 ],
             ],
         ];
-        $sheet->getStyle('A1:B16')->applyFromArray($styleArray);
+        $sheet->getStyle('A1:B' . $currentRow)->applyFromArray($styleArray);
 
-
-        $sheet->getStyle('A3:A16')->getFont()->setBold(true);
+        // Định dạng font chữ in đậm cột tiêu đề bên trái
+        $sheet->getStyle('A3:A' . $currentRow)->getFont()->setBold(true);
         $sheet->getColumnDimension('A')->setWidth(20);
         $sheet->getColumnDimension('B')->setWidth(40);
         
-
-        for ($i = 1; $i <= 16; $i++) {
+        // Thiết lập chiều cao dòng co giãn theo số lượng hàng được sinh ra
+        for ($i = 1; $i <= $currentRow; $i++) {
             if ($i == 1) {
-                $sheet->getRowDimension($i)->setRowHeight(35); // Dòng tiêu đề cao hơn
+                $sheet->getRowDimension($i)->setRowHeight(35);
             } else {
                 $sheet->getRowDimension($i)->setRowHeight(22);
             }
         }
 
-        // 5. Xuất file trả về cho trình duyệt
+        // XÓA SẠCH BỘ ĐỆM ĐẦU RA: Ngăn chặn triệt để rác text lỗi chui vào cấu trúc nhị phân của file Excel
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        // Cấu hình header phản hồi và tiến hành xuất file xlsx về trình duyệt
         $filename = "Phieu_Don_Hang_" . $order['order_code'] . ".xlsx";
         
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -337,7 +360,6 @@ class OrderController {
         $writer->save('php://output');
         exit();
     }
-
 
     public function rejectOldPrice() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
