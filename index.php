@@ -60,7 +60,9 @@ switch ($page) {
         break;
 
     case 'profile':
-        require_once 'app/Views/profile/profile.php';
+        require_once 'app/Controllers/ProfileController.php';
+        $profileController = new ProfileController();
+        $profileController->index();
         break;
     
     case 'logout':
