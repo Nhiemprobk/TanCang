@@ -11,7 +11,12 @@ class PricingController {
     // Hiển thị giao diện cài đặt giá
     public function index() {
         if (($_SESSION['role_level'] ?? 4) > 2) {
-            header("Location: index.php?page=orders");
+            // 1. Nạp tin nhắn gắt gỏng vào Session để View hứng hiện Popup
+            $_SESSION['error_msg'] = "Truy cập bị từ chối! Tài khoản của bạn không có thẩm quyền vào phân khu này.";
+            // 2. Lấy đường link của trang trước đó, nếu trình duyệt không lưu thì mặc định về trang home
+            $backUrl = $_SERVER['HTTP_REFERER'] ?? 'index.php?page=home';
+            // 3. Đá người dùng quay lại nơi họ vừa đứng
+            header("Location: " . $backUrl);
             exit();
         }
         $stmt = $this->pdo->query("SELECT * FROM logis_pricing ORDER BY container_type ASC");

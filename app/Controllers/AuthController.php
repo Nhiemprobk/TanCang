@@ -47,6 +47,8 @@ class AuthController {
                 }
 
                 // Lưu Session (Sử dụng đúng role_name và level)
+                $_SESSION['user_logged_in'] = true;
+                $_SESSION['last_activity'] = time();
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role_name'] ?? 'Không có quyền';

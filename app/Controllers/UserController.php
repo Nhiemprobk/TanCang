@@ -9,6 +9,15 @@ class UserController {
     }
 
     public function index() {
+        if (($_SESSION['role_level'] ?? 4) > 2) {
+            // 1. Nạp tin nhắn gắt gỏng vào Session để View hứng hiện Popup
+            $_SESSION['error_msg'] = "Truy cập bị từ chối! Tài khoản của bạn không có thẩm quyền vào phân khu này.";
+            // 2. Lấy đường link của trang trước đó, nếu trình duyệt không lưu thì mặc định về trang home
+            $backUrl = $_SERVER['HTTP_REFERER'] ?? 'index.php?page=home';
+            // 3. Đá người dùng quay lại nơi họ vừa đứng
+            header("Location: " . $backUrl);
+            exit();
+        }
         // Lấy danh sách user kèm theo tên quyền
         $stmt = $this->pdo->query("SELECT u.*, r.role_name as role_name 
                                    FROM users u 
