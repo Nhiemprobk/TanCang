@@ -73,7 +73,6 @@ switch ($page) {
         break;
 
     case 'orders':
-        // Đổi dòng gọi View cũ thành gọi Controller
         require_once 'app/Controllers/OrderController.php';
         $orderController = new OrderController();
         $orderController->index();
@@ -89,12 +88,6 @@ switch ($page) {
         require_once 'app/Controllers/OrderController.php';
         $orderController = new OrderController();
         $orderController->edit();
-        break;
-
-    case 'download_order':
-        require_once 'app/Controllers/OrderController.php';
-        $orderController = new OrderController();
-        $orderController->download();
         break;
 
     case 'reject_old_price':
@@ -143,7 +136,17 @@ switch ($page) {
         $roleController = new RoleController();
         $roleController->store();
         break;
-
+    case 'export':
+        require_once 'config/database.php';
+        require_once __DIR__ . '/app/Export/BaseExport.php';
+        require_once __DIR__ . '/app/Export/OrderExport.php';
+        require_once __DIR__ . '/app/Controllers/ExportController.php';
+        
+        $controller = new \App\Controllers\ExportController($pdo);
+        $action = $_GET['action'] ?? '';
+        if ($action === 'order') {
+            $controller->order();
+        }
     default:
         echo "404 - Trang không tồn tại";
         break;
