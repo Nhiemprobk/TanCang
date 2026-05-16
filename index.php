@@ -35,7 +35,8 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Nếu gửi Form đăng nhập (POST request)
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
+$pageRequest = $_GET['page'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username']) && isset($_POST['captcha']) && $pageRequest === 'login') {
     require_once 'app/Controllers/AuthController.php';
     $auth = new AuthController();
     $auth->handleLogin();

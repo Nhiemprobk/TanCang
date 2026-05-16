@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <form action="<?= $baseUrl ?>/index.php?page=update_user" method="POST">
+            <form action="index.php?page=store_user" method="POST">
                 <input type="hidden" name="id" id="edit_id">
                 <div class="modal-body p-4">
                     <div class="row g-3">
@@ -36,7 +36,7 @@
                                 <?php if(!empty($allRoles)): ?>
                                     <?php foreach($allRoles as $role): ?>
                                         <option value="<?= $role['id'] ?>">
-                                            <?= htmlspecialchars($role['name']) ?>
+                                            <?= htmlspecialchars($role['role_name']) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

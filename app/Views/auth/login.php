@@ -31,7 +31,7 @@
             <div class="alert alert-danger small py-2"><i class="fas fa-exclamation-circle"></i> <?= $error ?></div>
         <?php endif; ?>
 
-        <form action="" method="POST" autocomplete="off">
+        <form action="index.php?page=login" method="POST" autocomplete="off">
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">Tài khoản</label>
                 <input type="text" name="username" class="form-control" placeholder="Nhập tên đăng nhập..." required>

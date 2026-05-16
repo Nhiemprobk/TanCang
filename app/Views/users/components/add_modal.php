@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <form action="<?= $baseUrl ?>/index.php?page=store_user" method="POST">
+            <form action="index.php?page=store_user" method="POST"> 
                 <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-6">
