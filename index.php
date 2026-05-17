@@ -4,7 +4,7 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 // 0 có nghĩa là cookie chỉ tồn tại trong phiên làm việc hiện tại
 session_set_cookie_params(0, '/'); 
 
-// 2. Thiết lập thời gian tự động đăng xuất sau 10 phút nếu không thao tác (tăng tính chuyên nghiệp)
+// Thiết lập thời gian tự động đăng xuất sau 10 phút nếu không thao tác (tăng tính chuyên nghiệp)
 ini_set('session.gc_maxlifetime', 600);
 
 session_start();
@@ -14,6 +14,8 @@ require_once 'vendor/autoload.php';
 // Bật thông báo lỗi
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+
+$publicPages = ['login', 'auth', 'register', 'submit_register'];
 
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) {
     // Nếu đã lưu thời gian hoạt động cuối, và thời gian đó cách hiện tại quá 10 phút (600 giây)
@@ -34,8 +36,10 @@ if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Nếu gửi Form đăng nhập (POST request)
+// Lấy tham số url ?page=...
 $pageRequest = $_GET['page'] ?? '';
+
+// Nếu gửi Form đăng nhập (POST request)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username']) && isset($_POST['captcha']) && $pageRequest === 'login') {
     require_once 'app/Controllers/AuthController.php';
     $auth = new AuthController();
@@ -45,19 +49,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username']) && isset($
 
 // Kiểm tra xem User đã đăng nhập chưa
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
-    // Chưa đăng nhập -> Ép mở trang Login
-    require_once 'app/Controllers/AuthController.php';
-    $auth = new AuthController();
-    $auth->showLogin();
-    exit();
+    if (in_array($pageRequest, $publicPages, true)) {
+        // Cho phép các trang công khai khi chưa đăng nhập
+        $page = $pageRequest;
+    } else {
+        require_once 'app/Controllers/AuthController.php';
+        $auth = new AuthController();
+        $auth->showLogin();
+        exit();
+    }
+} else {
+    // Nếu đã đăng nhập, chuyển hướng khỏi trang login/register
+    if (in_array($pageRequest, ['login', 'register', 'submit_register'], true)) {
+        header('Location: index.php?page=home');
+        exit();
+    }
+    $page = $pageRequest ?: 'home';
 }
 
 // ============================================
 // CÁC TRANG BÊN TRONG HỆ THỐNG (Sau khi đã login)
 // ============================================
-$page = $_GET['page'] ?? 'home'; // Lấy tham số url ?page=...
 
 switch ($page) {
+    case 'login':
+        require_once 'app/Controllers/AuthController.php';
+        $authController = new AuthController();
+        $authController->showLogin();
+        break;
+
+    case 'register':
+        require_once 'app/Controllers/AuthController.php';
+        $authController = new AuthController();
+        $authController->showRegister();
+        break;
+
+    case 'submit_register':
+        require_once 'app/Controllers/AuthController.php';
+        $authController = new AuthController();
+        $authController->handleRegister();
+        break;
+
     case 'home':
         require_once 'app/Views/home/index.php';
         break;
@@ -69,8 +101,9 @@ switch ($page) {
         break;
     
     case 'logout':
-        session_destroy();
-        header("Location: index.php"); // Quay lại trang login
+        require_once 'app/Controllers/AuthController.php';
+        $authController = new AuthController();
+        $authController->logout();
         break;
 
     case 'orders':

@@ -80,7 +80,7 @@
 </div>
 
                 <div class="user-profile dropdown">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=fff&color=0284c7" alt="Avatar" class="rounded-circle me-2" width="35">
+                    
                     <span class="dropdown-toggle" data-bs-toggle="dropdown">Tài khoản</span>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                         <li><a class="dropdown-item" href="<?= $baseUrl ?>/index.php?page=profile"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>

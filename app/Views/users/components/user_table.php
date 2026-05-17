@@ -1,5 +1,5 @@
-<div class="dash-card border-0 shadow-sm overflow-hidden">
-    <div class="table-responsive">
+<div class="dash-card border-0 shadow-sm" style="overflow: visible;">
+    <div class="table-responsive" style="overflow: visible;">
         <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr>
@@ -50,7 +50,7 @@
                                 <button class="btn btn-light btn-sm rounded-circle border shadow-sm" data-bs-toggle="dropdown" style="width: 32px; height: 32px;">
                                     <i class="fas fa-ellipsis-v text-muted"></i>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
                                     <li><a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" 
                                            data-id="<?= $user['id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>" data-fullname="<?= htmlspecialchars($user['full_name']) ?>" 
                                            data-email="<?= htmlspecialchars($user['email']) ?>" data-phone="<?= htmlspecialchars($user['phone']) ?>" data-role="<?= $user['role_id'] ?>" onclick="fillEditModal(this)">

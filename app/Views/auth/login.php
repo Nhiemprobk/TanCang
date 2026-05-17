@@ -27,6 +27,9 @@
     </div>
     <div class="login-body">
         <!-- Nơi hiển thị thông báo lỗi từ Controller -->
+        <?php if(isset($_SESSION['success_msg'])): ?>
+            <div class="alert alert-success small py-2"><i class="fas fa-check-circle"></i> <?= $_SESSION['success_msg']; unset($_SESSION['success_msg']); ?></div>
+        <?php endif; ?>
         <?php if(isset($error)): ?>
             <div class="alert alert-danger small py-2"><i class="fas fa-exclamation-circle"></i> <?= $error ?></div>
         <?php endif; ?>
@@ -54,6 +57,13 @@
 
             <button type="submit" class="btn btn-login w-100 mb-3">ĐĂNG NHẬP</button>
             
+            <div class="text-center mt-4">
+            <span class="small text-muted">Chưa có tài khoản nội bộ? </span>
+                <a href="index.php?page=register" class="small fw-bold text-primary text-decoration-none">
+                    Đăng ký ngay <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+
             <div class="text-center">
                 <a href="#" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
             </div>

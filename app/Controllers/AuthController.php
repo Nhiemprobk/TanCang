@@ -74,10 +74,61 @@ class AuthController {
         }
     }
 
+    public function showRegister() {
+        // Truy vấn danh sách quyền từ Database để đổ ra thanh chọn Dropdown
+        try {
+            $stmtRoles = $this->pdo->query("SELECT id, role_name FROM roles ORDER BY level ASC");
+            $allRoles = $stmtRoles->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $allRoles = [];
+        }
+        
+        require_once 'app/Views/auth/register.php';
+    }
+
+    // Xử lý dữ liệu và Lưu vào Database
+    public function handleRegister() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = trim($_POST['username']);
+            $passwordPlain = $_POST['password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            if ($passwordPlain !== $confirmPassword) {
+                $_SESSION['error_msg'] = "Các mật khẩu vừa nhập không khớp nhau. Thử lại.";
+                header("Location: index.php?page=register");
+                exit();
+            }
+
+            $password = password_hash($passwordPlain, PASSWORD_DEFAULT); // Mã hóa chuẩn Bcrypt
+            $full_name = trim($_POST['full_name']);
+            $email = trim($_POST['email'] ?? '');
+            $phone = trim($_POST['phone'] ?? '');
+            $role_id = $_POST['role_id'];
+
+            try {
+                // Bơm dữ liệu vào các cột tương ứng, gán mặc định is_active = 1 và mốc thời gian NOW()
+                $stmt = $this->pdo->prepare("INSERT INTO users (username, password, full_name, email, phone, role_id, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, 1, NOW())");
+                $stmt->execute([$username, $password, $full_name, $email, $phone, $role_id]);
+                
+                $_SESSION['success_msg'] = "Tạo tài khoản thành công! Bạn có thể đăng nhập ngay.";
+                header("Location: index.php?page=login");
+                exit();
+                
+            } catch (PDOException $e) {
+                // Nếu trùng username đã có trong bảng users
+                $_SESSION['error_msg'] = "Tên đăng nhập này đã được sử dụng!";
+                header("Location: index.php?page=register");
+                exit();
+            }
+        }
+    }
+
     // Xử lý Đăng xuất
     public function logout() {
         session_destroy();
         header("Location: index.php?page=login");
         exit();
     }
+
+
 }
