@@ -178,6 +178,11 @@ switch ($page) {
         $roleController = new RoleController();
         $roleController->store();
         break;
+    case 'delete_role':
+        require_once 'app/Controllers/RoleController.php';
+        $roleController = new RoleController();
+        $roleController->delete();
+        break;
 
     case 'export':
         require_once 'config/database.php';

@@ -48,7 +48,9 @@
                         <td><span class="fw-bold text-dark"><?= htmlspecialchars($role['role_name']) ?></span></td>
                         <td class="text-start text-muted"><?= htmlspecialchars($role['description'] ?? 'Chưa có mô tả') ?></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Tính năng đang phát triển" style="width:28px; height:28px;"><i class="fas fa-edit" style="font-size:11px;"></i></button>
+                            <a class="btn btn-sm btn-outline-danger rounded-circle" title="Xóa quyền" style="width:28px; height:28px;" href="<?= $baseUrl ?>/index.php?page=delete_role&id=<?= $role['id'] ?>" onclick="return confirm('Xác nhận xóa nhóm quyền này?')">
+                                <i class="fas fa-trash" style="font-size:11px;"></i>
+                            </a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
