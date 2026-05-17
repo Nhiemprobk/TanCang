@@ -6,7 +6,12 @@ body {
     color: #334155;
     margin: 0;
 }
-
+.login-card {
+    max-width: 1000px !important;
+    /* Thay đổi con số này (ví dụ 500px, 600px) để chỉnh độ to */
+    width: 100% !important;
+    margin: 0 auto;
+}
 .wrapper { display: flex; height: 100vh; overflow: hidden; }
 
 /* SIDEBAR: Trắng sáng, hiện đại */

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-card { width: 100%; max-width: 400px; border: none; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; background: #fff; }
+        .login-card { width: 1000%; max-width: 700px; border: none; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; background: #fff; }
         .login-header { background: #0284c7; color: white; padding: 30px 20px; text-align: center; }
         .login-body { padding: 30px; }
         .form-control { border-radius: 8px; padding: 10px 15px; }
@@ -46,11 +46,11 @@
             
             <!-- Phần CAPTCHA -->
             <div class="mb-4">
-                <label class="form-label text-muted small fw-bold">Mã xác nhận</label>
+                <label class="form-label text-muted small fw-bold ">Mã xác nhận</label>
                 <div class="d-flex align-items-center gap-2">
-                    <input type="text" name="captcha" class="form-control" placeholder="Nhập mã bên cạnh" required style="width: 60%;">
+                    <input type="text" name="captcha" class="form-control" placeholder="Nhập mã bên cạnh" required style="width: 70%; height: 60px">
                     <!-- Gọi file captcha.php như một hình ảnh -->
-                    <img src="captcha.php" alt="CAPTCHA" id="captchaImage" class="rounded border" style="height: 40px; cursor: pointer;" title="Click để đổi mã" onclick="this.src='captcha.php?'+Math.random();">
+                    <img src="captcha.php" alt="CAPTCHA" id="captchaImage" class="rounded border" style="height: 60px; cursor: pointer;" title="Click để đổi mã" onclick="this.src='captcha.php?'+Math.random();">
                     <button type="button" class="btn btn-light border" onclick="document.getElementById('captchaImage').src='captcha.php?'+Math.random();"><i class="fas fa-sync-alt"></i></button>
                 </div>
             </div>
@@ -64,9 +64,7 @@
                 </a>
             </div>
 
-            <div class="text-center">
-                <a href="#" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
-            </div>
+            
         </form>
     </div>
 </div>
