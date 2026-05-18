@@ -208,6 +208,20 @@ switch ($page) {
         $userController = new UserController();
         $userController->update();
         break;
+        
+    case 'reports':
+        require_once 'config/database.php';
+        require_once 'app/Controllers/ReportController.php';
+        $controller = new ReportController();
+        $controller->index(); // Hiển thị giao diện bộ lọc ngày
+        break;
+
+    case 'export_report':
+        require_once 'config/database.php';
+        require_once 'app/Controllers/ReportController.php';
+        $controller = new ReportController();
+        $controller->exportExcel(); // Thực thi tải file Excel về máy
+        break;
 
     default:
         echo "404 - Trang không tồn tại";

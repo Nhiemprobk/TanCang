@@ -45,7 +45,7 @@
             </a>
 
             <p class="menu-label mt-3">HỆ THỐNG</p>
-            <a href="#"><i class="fas fa-file-excel"></i> Báo cáo & Thống kê</a>
+            <a href="<?= $baseUrl ?>/index.php?page=reports" class="<?= ($currentPage == 'reports') ? 'active' : '' ?>"><i class="fas fa-file-excel"></i> Báo cáo & Thống kê</a>
         </div>
     </aside>
 
