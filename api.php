@@ -1,59 +1,58 @@
 <?php
+// Đường dẫn: api.php (thư mục gốc)
 header('Content-Type: application/json');
-
-spl_autoload_register(function ($class) {
-    $prefix = 'App\\';
-    $base_dir = __DIR__ . '/app/';
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) return;
-    $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-    if (file_exists($file)) require $file;
-});
-
 session_start();
 
-use App\Services\NotificationManager;
-use App\Services\InAppNotifier;
-use App\Controllers\NotificationController;
+// Nạp kết nối Database
+require_once 'config/database.php';
+global $pdo;
 
-// Khởi tạo (hoặc lấy lại) đối tượng quản lý thông báo từ Session
-if (!isset($_SESSION['notifier'])) {
-    $_SESSION['notifier'] = new InAppNotifier();
+// Kiểm tra xem người dùng đã đăng nhập chưa
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['unread_count' => 0, 'notifications' => []]);
+    exit;
 }
-$notifier = $_SESSION['notifier'];
 
-// Khởi tạo Manager và gắn Observer vào
-$manager = new NotificationManager();
-$manager->attach($notifier);
-
-// Khởi tạo Controller điều phối
-$controller = new NotificationController($manager, $notifier);
-
+$user_id = $_SESSION['user_id'];
 $action = $_GET['action'] ?? '';
 
-// === ĐỊNH TUYẾN (ROUTING) API ===
+// === ĐỊNH TUYẾN (ROUTING) API XỬ LÝ THÔNG BÁO ===
 
-if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $msg = $controller->triggerEventAction($input['type'], $input['title']);
-    echo json_encode(['status' => 'success', 'message' => $msg]);
-} 
-elseif ($action === 'fetch') {
-    echo $controller->fetchNotificationsAPI();
+if ($action === 'fetch') {
+    // 1. Lấy danh sách 20 thông báo mới nhất của user đang đăng nhập
+    $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 20");
+    $stmt->execute([$user_id]);
+    $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. Đếm số lượng thông báo chưa đọc (is_read = 0)
+    $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+    $stmtCount->execute([$user_id]);
+    $unread_count = $stmtCount->fetchColumn();
+
+    // Trả về JSON cho Javascript
+    echo json_encode([
+        'unread_count'  => (int)$unread_count,
+        'notifications' => $notifications
+    ]);
 } 
 elseif ($action === 'mark_read' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Đánh dấu 1 thông báo là đã đọc
     $input = json_decode(file_get_contents('php://input'), true);
-    $notifier->markAsRead((int)$input['id']);
+    if (isset($input['id'])) {
+        $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
+        $stmt->execute([$input['id'], $user_id]);
+    }
     echo json_encode(['status' => 'success']);
 }
 elseif ($action === 'mark_all_read' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $notifier->markAllAsRead();
+    // Đánh dấu TẤT CẢ thông báo là đã đọc
+    $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?");
+    $stmt->execute([$user_id]);
     echo json_encode(['status' => 'success']);
 }
 elseif ($action === 'delete_all' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $notifier->deleteAll();
+    // Xóa toàn bộ thông báo của user này
+    $stmt = $pdo->prepare("DELETE FROM notifications WHERE user_id = ?");
+    $stmt->execute([$user_id]);
     echo json_encode(['status' => 'success']);
-
-    
 }

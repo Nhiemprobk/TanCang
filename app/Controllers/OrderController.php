@@ -256,37 +256,73 @@ class OrderController {
         $id = $_GET['id'];
         $action = $_GET['action'];
         
-        // Tự động lấy giờ hiện tại của hệ thống
         $current_time = date('Y-m-d H:i:s');
-        // Lấy tên người đang đăng nhập (hoặc để mặc định là Admin)
         $user_name = $_SESSION['username'] ?? 'Admin'; 
 
         if ($action === 'approve') {
-            // Nếu Duyệt: Đổi trạng thái, ghi lại ngày duyệt và người duyệt
             $sql = "UPDATE logis_orders SET status = 'Duyệt đồng ý', approval_date = ?, approver_name = ? WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$current_time, $user_name, $id]);
             $_SESSION['success_msg'] = "Đã duyệt đơn hàng thành công!";
             
+            // ==========================================
+            // TRIGGER THÔNG BÁO: ĐƠN HÀNG ĐÃ ĐƯỢC DUYỆT
+            // ==========================================
+            $this->sendNotificationToStaffs("Đơn hàng đã được duyệt", "Lệnh ID [$id] đã được phê duyệt bởi $user_name.");
+            
         } elseif ($action === 'reject') {
-            // Nếu Từ chối: Đổi trạng thái, ghi lại ngày duyệt và người duyệt
             $sql = "UPDATE logis_orders SET status = 'Duyệt từ chối', approval_date = ?, approver_name = ? WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$current_time, $user_name, $id]);
             $_SESSION['success_msg'] = "Đã từ chối đơn hàng!";
             
+            // ==========================================
+            // TRIGGER THÔNG BÁO: ĐƠN HÀNG BỊ TỪ CHỐI
+            // ==========================================
+            $this->sendNotificationToStaffs("Đơn hàng bị từ chối", "Lệnh ID [$id] đã bị $user_name từ chối duyệt.");
+            
         } elseif ($action === 'complete') {
-            // Nếu Hoàn thành: Đổi trạng thái, ghi lại ngày hoàn thành
             $sql = "UPDATE logis_orders SET status = 'Hoàn thành', completion_date = ? WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$current_time, $id]);
             $_SESSION['success_msg'] = "Xác nhận đơn hàng đã hoàn tất!";
         }
 
-        // Tự động quay lại trang cũ (để giữ nguyên trạng thái tìm kiếm/phân trang)
         $referer = $_SERVER['HTTP_REFERER'] ?? "index.php?page=orders";
         header("Location: " . $referer);
         exit();
+    }
+
+    // HÀM HỖ TRỢ: Gửi thông báo đến nhóm Staff (Role 3)
+    // Bạn dán hàm này nằm ngay dưới hàm changeStatus() nhé
+    private function sendNotificationToStaffs($title, $message) {
+        $sqlGetStaff = "SELECT id FROM users WHERE role_id = 3 AND is_active = 1";
+        $stmtUsers = $this->pdo->query($sqlGetStaff);
+        $staffList = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($staffList) {
+            $sqlInsertNotif = "INSERT INTO notifications (user_id, title, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())";
+            $stmtNotif = $this->pdo->prepare($sqlInsertNotif);
+            foreach ($staffList as $user) {
+                $stmtNotif->execute([$user['id'], $title, $message]);
+            }
+            $sqlCleanup = "
+        DELETE FROM notifications 
+        WHERE user_id = ? 
+        AND id NOT IN (
+            SELECT id FROM (
+                SELECT id FROM notifications 
+                WHERE user_id = ? 
+                ORDER BY id DESC 
+                LIMIT 50
+            ) AS tmp
+        )
+    ";
+    $stmtCleanup = $pdo->prepare($sqlCleanup);
+    foreach ($approvers as $user) {
+        $stmtCleanup->execute([$user['id'], $user['id']]);
+    }
+        }
     }
 }
 ?>

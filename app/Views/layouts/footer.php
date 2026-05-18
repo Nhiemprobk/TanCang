@@ -1,4 +1,7 @@
-</main> </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</main> 
+</div> 
+</div> 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     // Xử lý nút bấm ẩn/hiện Sidebar
@@ -14,66 +17,84 @@
 </script>
 
 <script>
-    // Khai báo đường dẫn API sử dụng biến $baseUrl để tránh lỗi 404
-    const apiNotification = '<?= $baseUrl ?>/api.php';
+document.addEventListener("DOMContentLoaded", function() {
+    // Gọi ngay khi tải trang
+    fetchNotifications();
+    // Tự động quét tìm thông báo mới mỗi 3 giây (3000 ms)
+    setInterval(fetchNotifications, 3000); 
+});
 
-    async function pollNotifications() {
-        try {
-            const res = await fetch(apiNotification + '?action=fetch');
-            const data = await res.json();
-            
-            // Cập nhật số lượng huy hiệu (badge)
+function fetchNotifications() {
+    // Gọi đến api.php để lấy dữ liệu từ Database
+    fetch('<?= $baseUrl ?>/api.php?action=fetch')
+        .then(res => res.json())
+        .then(data => {
             const countEl = document.getElementById('notiCount');
-            countEl.innerText = data.unread_count;
-            countEl.style.display = data.unread_count > 0 ? 'block' : 'none';
-            
-            // Xử lý khung hiển thị thông báo
-            const notiList = document.getElementById('notiList');
-            if(data.notifications.length === 0) {
-                notiList.innerHTML = '<div class="text-center p-4 text-muted small"><i class="fas fa-box-open fs-3 mb-2 opacity-50"></i><br>Không có thông báo</div>';
-                return;
+            const listEl = document.getElementById('notiList');
+
+            // 1. Cập nhật con số trên cái chuông
+            if (data.unread_count > 0) {
+                countEl.innerText = data.unread_count;
+                countEl.style.display = 'inline-block';
+            } else {
+                countEl.style.display = 'none';
             }
-            
-            // Đảo ngược mảng để thông báo mới lên đầu và Render HTML
-            notiList.innerHTML = data.notifications.reverse().map(n => `
-                <div class="noti-item ${n.is_read ? '' : 'unread'} level-${n.level}" onclick="readNotification(${n.id}, event)">
-                    <h6><i class="fas fa-circle ms-1 fs-6 float-end ${n.is_read ? 'text-transparent' : 'text-primary'}"></i> ${n.title}</h6>
-                    <p>${n.body}</p>
-                    <span class="time"><i class="far fa-clock me-1"></i> ${n.created_at}</span>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error("Lỗi khi tải thông báo:", error);
-        }
-    }
 
-    async function readNotification(id, e) {
-        // Ngăn chặn việc click làm Dropdown của Bootstrap tự đóng lại
-        e.stopPropagation(); 
-        await fetch(apiNotification + '?action=mark_read', {
-            method: 'POST',
-            body: JSON.stringify({id})
-        });
-        // Tải lại danh sách ngay lập tức để xóa viền xanh "chưa đọc"
-        pollNotifications(); 
-    }
+            // 2. Đổ danh sách vào thẻ Dropdown
+            if (data.notifications && data.notifications.length > 0) {
+                let html = '';
+                data.notifications.forEach(noti => {
+                    // Nếu chưa đọc thì nền xanh, chữ in đậm
+                    let bgClass = noti.is_read == 0 ? 'bg-light border-start border-primary border-4' : '';
+                    let fwClass = noti.is_read == 0 ? 'fw-bold' : '';
+                    
+                    // Xử lý ngày tháng cho đẹp
+                    let dateObj = new Date(noti.created_at);
+                    let dateStr = dateObj.toLocaleDateString('vi-VN') + ' ' + dateObj.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
 
-    async function markAllRead(e) {
-        e.stopPropagation(); // Giữ cho bảng thông báo không bị đóng khi click
-        await fetch(apiNotification + '?action=mark_all_read', { method: 'POST' });
-        pollNotifications(); // Tải lại giao diện
-    }
+                    html += `
+                        <div class="p-3 border-bottom ${bgClass}" onclick="markRead(${noti.id}, event)" style="cursor: pointer; transition: 0.2s;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="${fwClass} text-dark" style="font-size: 14px;">${noti.title}</span>
+                                <small class="text-muted" style="font-size: 11px;">${dateStr}</small>
+                            </div>
+                            <div class="text-muted" style="font-size: 13px;">${noti.message}</div>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+            } else {
+                listEl.innerHTML = '<div class="text-center p-4 text-muted small"><i class="fas fa-box-open fa-2x mb-2 text-gray-300"></i><br>Không có thông báo nào</div>';
+            }
+        })
+        .catch(err => console.error("Lỗi tải thông báo:", err));
+}
 
-    async function deleteAllNoti(e) {
-        e.stopPropagation();
-        await fetch(apiNotification + '?action=delete_all', { method: 'POST' });
-        pollNotifications();
-    }
+// Bấm vào 1 thông báo để đánh dấu đã đọc
+function markRead(id, e) {
+    e.stopPropagation(); // Ngăn dropdown bị đóng lại khi click
+    fetch('<?= $baseUrl ?>/api.php?action=mark_read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+    }).then(() => fetchNotifications()); // Load lại giao diện chuông
+}
 
-    // Gọi lần đầu và thiết lập lặp lại mỗi 3 giây (Polling)
-    pollNotifications();
-    setInterval(pollNotifications, 3000);
+// Nút Đánh dấu đã đọc tất cả
+function markAllRead(e) {
+    e.stopPropagation(); // Giữ cho popup không bị tắt khi bấm
+    fetch('<?= $baseUrl ?>/api.php?action=mark_all_read', { method: 'POST' })
+        .then(() => fetchNotifications());
+}
+
+// Nút Xóa tất cả
+function deleteAllNoti(e) {
+    e.stopPropagation();
+    if(confirm('Bạn có chắc chắn muốn xóa sạch lịch sử thông báo?')) {
+        fetch('<?= $baseUrl ?>/api.php?action=delete_all', { method: 'POST' })
+            .then(() => fetchNotifications());
+    }
+}
 </script>
-
 </body>
 </html>
