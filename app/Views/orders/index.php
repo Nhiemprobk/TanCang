@@ -1,13 +1,6 @@
 <?php require_once 'app/Views/layouts/header.php'; ?>
 
-<style>
-    .table-scrollable { overflow-x: auto; overflow-y: hidden;}
-    .table-scrollable::-webkit-scrollbar { height: 8px; }
-    .table-scrollable::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-    .table-scrollable::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    .table-scrollable::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    .table-compact th, .table-compact td { padding: 0.5rem 0.6rem !important; }
-</style>
+<link rel="stylesheet" href="<?= $baseUrl ?>/public/css/pages/orders.css">
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0 text-dark"><i class="fas fa-clipboard-check text-primary me-2"></i>Tiếp nhận đơn hàng</h4>
@@ -33,21 +26,6 @@
 
 <?php include 'components/reject_modal.php'; ?>
 
-<script>
-// Script hỗ trợ đổi màu nút lọc (dù đã có PHP xử lý nhưng giữ lại nếu bạn cần mở rộng sau này)
-document.addEventListener('DOMContentLoaded', function() {
-    const statusBtns = document.querySelectorAll('.filter-status');
-    statusBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            statusBtns.forEach(b => {
-                b.classList.remove('btn-primary', 'fw-bold');
-                b.classList.add('btn-outline-secondary');
-            });
-            this.classList.remove('btn-outline-secondary');
-            this.classList.add('btn-primary', 'fw-bold');
-        });
-    });
-});
-</script>
+<script src="<?= $baseUrl ?>/public/js/pages/orders.js"></script>
 
 <?php require_once 'app/Views/layouts/footer.php'; ?>
