@@ -20,12 +20,12 @@
 <div class="wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-ship me-2"></i> LOGIS<span class="text-info">PORT</span>
+            <i class="fas fa-ship me-2"></i> TÂN<span class="text-info">CẢNG</span>
         </div>
         <div class="sidebar-menu">
             <p class="menu-label">BẢNG ĐIỀU KHIỂN</p>
             <a href="<?= $baseUrl ?>/index.php?page=home" class="<?= ($currentPage == 'home') ? 'active' : '' ?>">
-                <i class="fas fa-chart-pie"></i> Tổng quan (Dashboard)
+                <i class="fas fa-chart-pie"></i> Tổng quan 
             </a>
             
             <p class="menu-label mt-3">NGHIỆP VỤ LOGISTICS</p>
@@ -41,7 +41,7 @@
                 <i class="fas fa-users-cog"></i> Tài khoản nhân sự
             </a>
             <a href="<?= $baseUrl ?>/index.php?page=roles" class="<?= ($currentPage == 'roles') ? 'active' : '' ?>">
-                <i class="fas fa-user-shield"></i> Nhóm Quyền (Roles)
+                <i class="fas fa-user-shield"></i> Nhóm quyền 
             </a>
 
             <p class="menu-label mt-3">HỆ THỐNG</p>

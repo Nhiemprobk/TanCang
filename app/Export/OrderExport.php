@@ -18,7 +18,7 @@ class OrderExport extends BaseExport {
     protected function buildSheet() {
         $this->sheet->setTitle('Phiếu Đơn Hàng');
 
-        $this->sheet->setCellValue('A1', 'PHIẾU TIẾP NHẬN ĐƠN HÀNG - LOGISPORT');
+        $this->sheet->setCellValue('A1', 'PHIẾU TIẾP NHẬN ĐƠN HÀNG - TÂN CẢNG');
         $this->sheet->mergeCells('A1:B1');
         $this->sheet->setCellValue('A3', 'Mã đơn hàng');
         $this->sheet->setCellValue('B3', $this->order['order_code']);
