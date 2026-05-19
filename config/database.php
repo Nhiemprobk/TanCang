@@ -1,5 +1,4 @@
 <?php
-// Thay đổi 'Tên_Database_Của_Bạn' bằng tên DB thực tế trong phpMyAdmin
 $host = 'localhost';
 $dbname = 'tancang'; 
 $username = 'root';

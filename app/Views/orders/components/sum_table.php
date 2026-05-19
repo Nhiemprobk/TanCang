@@ -1,4 +1,4 @@
-<div class="row justify-content-center mb-4">
+<div class="row justify-content-center mb-4"> 
     <div class="col-12">
         <div class="dash-card p-3">
             <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-chart-pie text-success me-2"></i>Tổng hợp sản lượng trang hiện tại</h6>

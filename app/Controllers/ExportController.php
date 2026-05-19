@@ -37,12 +37,4 @@ class ExportController {
         $export = new OrderExport($order, $details);
         $export->download($filename);
     }
-
-    /* * Ví dụ tương lai:
-     * public function report() {
-     * $data = ...;
-     * $export = new ReportExport($data);
-     * $export->download('Bao_Cao.xlsx');
-     * }
-     */
 }
