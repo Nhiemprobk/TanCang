@@ -121,9 +121,9 @@ switch ($page) {
 
     case 'export':
         require_once 'config/database.php';
-        require_once __DIR__ . '/app/Export/BaseExport.php';
-        require_once __DIR__ . '/app/Export/OrderExport.php';
-        require_once __DIR__ . '/app/Controllers/ExportController.php';
+        require_once __DIR__ . '/../app/Export/BaseExport.php';
+        require_once __DIR__ . '/../app/Export/OrderExport.php';
+        require_once __DIR__ . '/../app/Controllers/ExportController.php';
         
         $controller = new \App\Controllers\ExportController($pdo);
         $action = $_GET['action'] ?? '';
