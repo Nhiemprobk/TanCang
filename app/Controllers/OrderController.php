@@ -307,21 +307,21 @@ class OrderController {
                 $stmtNotif->execute([$user['id'], $title, $message]);
             }
             $sqlCleanup = "
-        DELETE FROM notifications 
-        WHERE user_id = ? 
-        AND id NOT IN (
-            SELECT id FROM (
-                SELECT id FROM notifications 
+                DELETE FROM notifications 
                 WHERE user_id = ? 
-                ORDER BY id DESC 
-                LIMIT 50
-            ) AS tmp
-        )
-    ";
-    $stmtCleanup = $pdo->prepare($sqlCleanup);
-    foreach ($approvers as $user) {
-        $stmtCleanup->execute([$user['id'], $user['id']]);
-    }
+                AND id NOT IN (
+                    SELECT id FROM (
+                        SELECT id FROM notifications 
+                        WHERE user_id = ? 
+                        ORDER BY id DESC 
+                        LIMIT 50
+                    ) AS tmp
+                )
+            ";
+            $stmtCleanup = $this->pdo->prepare($sqlCleanup);
+            foreach ($staffList as $user) {
+                $stmtCleanup->execute([$user['id'], $user['id']]);
+            }
         }
     }
 }
