@@ -144,12 +144,12 @@ switch ($page) {
         $userController->update();
         break;
         
-    case 'reports':
-        require_once 'config/database.php';
-        require_once 'app/Controllers/ReportController.php';
-        $controller = new ReportController();
-        $controller->index(); // Hiển thị giao diện bộ lọc ngày
-        break;
+    // case 'reports':
+    //     require_once 'config/database.php';
+    //     require_once 'app/Controllers/ReportController.php';
+    //     $controller = new ReportController();
+    //     $controller->index(); // Hiển thị giao diện bộ lọc ngày
+    //     break;
 
     case 'export_report':
         require_once 'config/database.php';

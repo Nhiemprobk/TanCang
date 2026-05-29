@@ -21,7 +21,7 @@ class ReportController {
     // Hàm thực hiện xử lý xuất file Excel
     public function exportExcel() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: index.php?page=reports");
+            header("Location: index.php?page=home");
             exit;
         }
 
