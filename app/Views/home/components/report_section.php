@@ -1,15 +1,12 @@
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-5 mt-4">
     <div class="col-12">
         <div class="dash-card p-4 shadow-sm bg-white rounded-3 border-0">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center" style="width:48px; height:48px;">
-                        <i class="fas fa-file-excel fa-lg"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-1">Xuất Báo Cáo Lệnh Cảng</h5>
-                        <p class="text-muted small mb-0">Tải Excel báo cáo lệnh theo khoảng thời gian bạn chọn.</p>
-                    </div>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="d-flex align-items-center justify-content-center" style="width:32px; height:32px;">
+                    <i class="fas fa-file-excel text-primary"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1">Xuất Báo Cáo Lệnh Cảng</h6>
                 </div>
             </div>
 

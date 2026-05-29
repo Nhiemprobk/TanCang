@@ -44,8 +44,7 @@
                 <i class="fas fa-user-shield"></i> Nhóm quyền 
             </a>
 
-            <p class="menu-label mt-3">HỆ THỐNG</p>
-            <!-- Báo cáo đã tích hợp vào Home -->
+            
         </div>
     </aside>
 
