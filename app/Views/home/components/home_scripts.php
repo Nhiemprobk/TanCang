@@ -2,33 +2,27 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const ctx = document.getElementById('revenueChart').getContext('2d');
-    const realRevenueInMillions = <?= round($totalRevenue / 1000000, 1) ?>;
+
+    const revenueLabels = <?= json_encode($revenueLabels ?? [], JSON_UNESCAPED_UNICODE) ?>;
+    const revenueData = <?= json_encode($revenueData ?? [], JSON_UNESCAPED_UNICODE) ?>;
 
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Hôm nay'],
+            labels: revenueLabels,
             datasets: [{
                 label: 'Doanh thu (Triệu VNĐ)',
-                data: [15.2, 22.5, 18.0, 30.1, 25.8, 40.0, realRevenueInMillions],
-                backgroundColor: [
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(54, 162, 235, 0.4)',
-                    'rgba(25, 135, 84, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(25, 135, 84, 1)'
-                ],
+                data: revenueData,
+                backgroundColor: revenueLabels.map((label, index) => {
+                    return label === 'Hôm nay'
+                        ? 'rgba(25, 135, 84, 0.8)'
+                        : 'rgba(54, 162, 235, 0.4)';
+                }),
+                borderColor: revenueLabels.map((label, index) => {
+                    return label === 'Hôm nay'
+                        ? 'rgba(25, 135, 84, 1)'
+                        : 'rgba(54, 162, 235, 1)';
+                }),
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -36,12 +30,24 @@ document.addEventListener("DOMContentLoaded", function() {
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw + ' triệu VNĐ';
+                        }
+                    }
+                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: {
+                        callback: function(value) {
+                            return value + 'tr';
+                        }
+                    }
                 },
                 x: {
                     grid: { display: false }
