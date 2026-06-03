@@ -1,0 +1,29 @@
+/* =========================================
+   TYPOGRAPHY
+   ========================================= */
+/* Kích thước chữ chuẩn cho bảng và tiêu đề modal */
+.text-13px {
+    font-size: 13px;
+}
+
+.text-16px {
+    font-size: 16px;
+}
+
+/* Kích thước icon cực nhỏ */
+.icon-11px {
+    font-size: 11px;
+}
+
+/* =========================================
+   BUTTONS & ICONS
+   ========================================= */
+/* Nút tác vụ dạng tròn kích thước 28x28 */
+.btn-icon-28 {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}

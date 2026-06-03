@@ -1,6 +1,6 @@
 <div class="dash-card p-4">
     <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle text-center mb-0" style="font-size: 13px;">
+        <table class="table table-hover table-bordered align-middle text-center mb-0 text-13px">
             <thead class="table-light">
                 <tr>
                     <th width="60">ID</th>
@@ -31,8 +31,8 @@
                         <td><span class="fw-bold text-dark"><?= htmlspecialchars($role['role_name']) ?></span></td>
                         <td class="text-start text-muted"><?= htmlspecialchars($role['description'] ?? 'Chưa có mô tả') ?></td>
                         <td>
-                            <a class="btn btn-sm btn-outline-danger rounded-circle" title="Xóa quyền" style="width:28px; height:28px;" href="<?= $baseUrl ?>/index.php?page=delete_role&id=<?= $role['id'] ?>" onclick="return confirm('Xác nhận xóa nhóm quyền này?')">
-                                <i class="fas fa-trash" style="font-size:11px;"></i>
+                            <a class="btn btn-sm btn-outline-danger rounded-circle btn-icon-28" title="Xóa quyền" href="<?= $baseUrl ?>/index.php?page=delete_role&id=<?= $role['id'] ?>" onclick="return confirm('Xác nhận xóa nhóm quyền này?')">
+                                <i class="fas fa-trash icon-11px"></i>
                             </a>
                         </td>
                     </tr>

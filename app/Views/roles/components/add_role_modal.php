@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold text-dark" style="font-size: 16px;"><i class="fas fa-plus-circle text-primary me-2"></i>Thêm Nhóm Quyền Mới</h5>
+                <h5 class="modal-title fw-bold text-dark text-16px"><i class="fas fa-plus-circle text-primary me-2"></i>Thêm Nhóm Quyền Mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= $baseUrl ?>/index.php?page=store_role" method="POST">
