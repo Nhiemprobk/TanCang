@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="dash-card p-4 shadow-sm bg-white rounded-3 border-0">
             <div class="d-flex align-items-center gap-2 mb-3">
-                <div class="d-flex align-items-center justify-content-center" style="width:32px; height:32px;">
+                <div class="d-flex align-items-center justify-content-center icon-box-32">
                     <i class="fas fa-file-excel text-primary"></i>
                 </div>
                 <div>

@@ -1,7 +1,93 @@
-/* Styles moved from app/Views/orders/index.php */
-.table-scrollable { overflow-x: auto; overflow-y: hidden; }
-.table-scrollable::-webkit-scrollbar { height: 8px; }
-.table-scrollable::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-.table-scrollable::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-.table-scrollable::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-.table-compact th, .table-compact td { padding: 0.5rem 0.6rem !important; }
+/* =========================================
+   SCROLLBAR & TABLE CUSTOMIZATIONS
+   ========================================= */
+.table-scrollable {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.table-scrollable::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-scrollable::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.table-scrollable::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.table-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.table-compact th,
+.table-compact td {
+    padding: 0.5rem 0.6rem !important;
+}
+
+/* Font size chuẩn cho các bảng trong trang orders */
+.table-compact-font {
+    font-size: 13px;
+}
+
+/* Màu nền custom cho thead */
+.thead-custom-primary {
+    background-color: #0284c7;
+}
+
+/* Cột cần độ rộng tối thiểu */
+.min-w-130 {
+    min-width: 130px;
+}
+
+/* =========================================
+   BUTTONS & ICONS
+   ========================================= */
+/* Nút tác vụ dạng tròn nhỏ trong bảng */
+.btn-icon-circle {
+    width: 28px;
+    height: 28px;
+}
+
+.icon-sm {
+    font-size: 12px;
+}
+
+/* Tab trạng thái (Status tabs) */
+.status-tab-btn {
+    height: 31px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* =========================================
+   MODALS CUSTOMIZATIONS
+   ========================================= */
+/* Box shadow và bo góc cho modal */
+.custom-modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Hộp icon cảnh báo */
+.icon-box-lg {
+    width: 48px;
+    height: 48px;
+}
+
+/* Alert viền trái (Left border alert) */
+.alert-warning-custom {
+    border-left: 4px solid #f59e0b !important;
+}
+
+/* Textarea custom */
+.custom-textarea {
+    border-radius: 10px;
+    resize: none;
+    border: 1px solid #e2e8f0;
+}

@@ -1,4 +1,57 @@
-/* Styles moved from app/Views/users/index.php */
-.ripple-success { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.4); animation: ripple 1.5s infinite; }
-@keyframes ripple { 0% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(25, 135, 84, 0); } 100% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); } }
-.table-hover tbody tr:hover { background-color: #f8fafc !important; transition: all 0.2s ease; }
+/* =========================================
+   ANIMATIONS & HOVER EFFECTS
+   ========================================= */
+.ripple-success {
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.4);
+    animation: ripple 1.5s infinite;
+}
+
+@keyframes ripple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 8px rgba(25, 135, 84, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+    }
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc !important;
+    transition: all 0.2s ease;
+}
+
+/* =========================================
+   TYPOGRAPHY & LAYOUT CUSTOMIZATIONS
+   ========================================= */
+/* Font size chuẩn cho các text nhỏ */
+.text-11px {
+    font-size: 11px;
+}
+
+.text-13px {
+    font-size: 13px;
+}
+
+/* Override overflow để hiển thị Dropdown không bị cắt */
+.overflow-visible-custom {
+    overflow: visible !important;
+}
+
+/* Nút bấm (button) tròn kích thước 32x32 */
+.btn-icon-32 {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Đảm bảo dropdown menu luôn nổi lên trên cùng */
+.dropdown-menu-custom {
+    z-index: 1050;
+}

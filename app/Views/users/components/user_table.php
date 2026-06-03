@@ -1,13 +1,13 @@
-<div class="dash-card border-0 shadow-sm" style="overflow: visible;">
-    <div class="table-responsive" style="overflow: visible;">
+<div class="dash-card border-0 shadow-sm overflow-visible-custom">
+    <div class="table-responsive overflow-visible-custom">
         <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr>
-                    <th class="ps-4 py-3 text-muted fw-bold" style="font-size: 13px;">THÔNG TIN NGƯỜI DÙNG</th>
-                    <th class="py-3 text-muted fw-bold" style="font-size: 13px;">VAI TRÒ / QUYỀN</th>
-                    <th class="py-3 text-muted fw-bold" style="font-size: 13px;">LIÊN HỆ</th>
-                    <th class="py-3 text-muted fw-bold" style="font-size: 13px;">TRẠNG THÁI</th>
-                    <th class="py-3 text-center text-muted fw-bold" style="font-size: 13px;">THAO TÁC</th>
+                    <th class="ps-4 py-3 text-muted fw-bold text-13px">THÔNG TIN NGƯỜI DÙNG</th>
+                    <th class="py-3 text-muted fw-bold text-13px">VAI TRÒ / QUYỀN</th>
+                    <th class="py-3 text-muted fw-bold text-13px">LIÊN HỆ</th>
+                    <th class="py-3 text-muted fw-bold text-13px">TRẠNG THÁI</th>
+                    <th class="py-3 text-center text-muted fw-bold text-13px">THAO TÁC</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,10 +47,10 @@
                         </td>
                         <td class="text-center">
                             <div class="dropdown">
-                                <button class="btn btn-light btn-sm rounded-circle border shadow-sm" data-bs-toggle="dropdown" style="width: 32px; height: 32px;">
+                                <button class="btn btn-light btn-sm rounded-circle border shadow-sm btn-icon-32" data-bs-toggle="dropdown">
                                     <i class="fas fa-ellipsis-v text-muted"></i>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 dropdown-menu-custom">
                                     <li><a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" 
                                            data-id="<?= $user['id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>" data-fullname="<?= htmlspecialchars($user['full_name']) ?>" 
                                            data-email="<?= htmlspecialchars($user['email']) ?>" data-phone="<?= htmlspecialchars($user['phone']) ?>" data-role="<?= $user['role_id'] ?>" onclick="fillEditModal(this)">

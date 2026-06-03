@@ -6,7 +6,7 @@
                     <p class="text-muted mb-2 small fw-bold text-uppercase tracking-wide">Tổng Doanh Thu Dịch Vụ</p>
                     <h2 class="fw-bold text-success mb-0"><?= number_format($totalRevenue, 0, ',', '.') ?> <span class="fs-5 text-muted fw-normal">VNĐ</span></h2>
                 </div>
-                <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center icon-box-60">
                     <i class="fas fa-money-bill-wave fs-3"></i>
                 </div>
             </div>
@@ -20,7 +20,7 @@
                     <p class="text-muted mb-2 small fw-bold text-uppercase tracking-wide">Lệnh Đang Chờ Duyệt</p>
                     <h2 class="fw-bold text-danger mb-0"><?= $pendingCount ?> <span class="fs-5 text-muted fw-normal">Yêu cầu</span></h2>
                 </div>
-                <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex justify-content-center align-items-center icon-box-60">
                     <i class="fas fa-clock fs-3"></i>
                 </div>
             </div>

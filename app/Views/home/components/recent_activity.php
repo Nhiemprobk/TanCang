@@ -1,7 +1,7 @@
 <div class="col-md-4">
     <div class="dash-card p-4 h-100 shadow-sm bg-white rounded-3">
         <h6 class="fw-bold text-dark mb-4"><i class="fas fa-bell text-warning me-2"></i>Hoạt động mới nhất</h6>
-        <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+        <div class="notification-list scrollable-list-400">
             <?php if(empty($recentOrders)): ?>
                 <p class="text-muted small text-center mt-4">Chưa có hoạt động nào.</p>
             <?php else: ?>
@@ -9,11 +9,11 @@
                     <div class="d-flex border-bottom pb-3 mb-3">
                         <div class="mt-1 me-3">
                             <?php if($ro['status'] == 'Chờ duyệt'): ?>
-                                <span class="bg-danger rounded-circle d-inline-block" style="width: 10px; height: 10px;"></span>
+                                <span class="bg-danger rounded-circle d-inline-block status-dot-10"></span>
                             <?php elseif($ro['status'] == 'Hoàn thành' || $ro['status'] == 'Đã thanh toán'): ?>
-                                <span class="bg-success rounded-circle d-inline-block" style="width: 10px; height: 10px;"></span>
+                                <span class="bg-success rounded-circle d-inline-block status-dot-10"></span>
                             <?php else: ?>
-                                <span class="bg-info rounded-circle d-inline-block" style="width: 10px; height: 10px;"></span>
+                                <span class="bg-info rounded-circle d-inline-block status-dot-10"></span>
                             <?php endif; ?>
                         </div>
                         <div>
@@ -23,7 +23,7 @@
                             </p>
                             <div class="d-flex align-items-center gap-2 mt-2">
                                 <span class="badge bg-light text-dark border"><?= $ro['status'] ?></span>
-                                <span style="font-size: 11px; color: #888;"><i class="fas fa-clock me-1"></i><?= date('d/m H:i', strtotime($ro['created_at'])) ?></span>
+                                <span class="text-time-sm"><i class="fas fa-clock me-1"></i><?= date('d/m H:i', strtotime($ro['created_at'])) ?></span>
                             </div>
                         </div>
                     </div>

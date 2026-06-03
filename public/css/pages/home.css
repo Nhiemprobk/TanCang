@@ -1,0 +1,35 @@
+/* =========================================
+   METRICS CARDS & ICONS
+   ========================================= */
+/* Hộp chứa icon kích thước lớn (Metrics) */
+.icon-box-60 {
+    width: 60px;
+    height: 60px;
+}
+
+/* Hộp chứa icon kích thước nhỏ (Report section) */
+.icon-box-32 {
+    width: 32px;
+    height: 32px;
+}
+
+/* =========================================
+   RECENT ACTIVITY LIST
+   ========================================= */
+/* Box cuộn danh sách hoạt động */
+.scrollable-list-400 {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Chấm tròn trạng thái nhỏ */
+.status-dot-10 {
+    width: 10px;
+    height: 10px;
+}
+
+/* Text hiển thị thời gian nhỏ màu xám */
+.text-time-sm {
+    font-size: 11px;
+    color: #888;
+}
