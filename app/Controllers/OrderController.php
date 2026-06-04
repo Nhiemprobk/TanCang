@@ -140,16 +140,45 @@ class OrderController {
     }
 
     public function delete() {
-        // Kiểm tra xem trên URL có truyền id lên không
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             
-            // Dùng PDO prepare để chống lỗi bảo mật SQL Injection
+            // 1. Lấy mã order_code trước khi xóa để làm nội dung thông báo
+            $stmtOrder = $this->pdo->prepare("SELECT order_code FROM logis_orders WHERE id = ?");
+            $stmtOrder->execute([$id]);
+            $order = $stmtOrder->fetch(PDO::FETCH_ASSOC);
+            $order_code = $order ? $order['order_code'] : "ID $id";
+
+            // 2. Thực hiện xóa đơn hàng
             $stmt = $this->pdo->prepare("DELETE FROM logis_orders WHERE id = ?");
             $stmt->execute([$id]);
+
+            // ==========================================
+            // 3. TRIGGER THÔNG BÁO: ĐÃ XÓA ĐƠN HÀNG
+            // ==========================================
+            $deleter_name = $_SESSION['username'] ?? 'Một nhân viên';
+            $title = "Cảnh báo: Đơn hàng bị xóa";
+            $message = "Tài khoản $deleter_name vừa xóa đơn hàng $order_code ra khỏi hệ thống.";
+
+            // Lấy ID của người đang thao tác
+            $current_user_id = (int)($_SESSION['user_id'] ?? 0);
+            
+            // Chỉ lấy Admin (role 1) HOẶC chính người vừa thao tác
+            $stmtAdmins = $this->pdo->query("SELECT id FROM users WHERE is_active = 1 AND (role_id = 1 OR id = $current_user_id)");
+            $admins = $stmtAdmins->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($admins) {
+                // is_read = 0 (Trạng thái mặc định là chưa đọc)
+                $sqlNotif = "INSERT INTO notifications (user_id, title, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())";
+                $stmtNotif = $this->pdo->prepare($sqlNotif);
+
+                foreach ($admins as $admin) {
+                    $stmtNotif->execute([$admin['id'], $title, $message]);
+                }
+            }
+            // ==========================================
         }
         
-        // Xóa xong thì tự động quay ngoắt về lại trang danh sách đơn hàng
         header("Location: index.php?page=orders");
         exit();
     }
@@ -179,7 +208,6 @@ class OrderController {
         require_once 'app/Views/orders/edit.php';
     }
 
-    // BẠN DÁN HÀM UPDATE NÀY NGAY BÊN DƯỚI HÀM EDIT NHÉ
     public function update() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
@@ -197,28 +225,49 @@ class OrderController {
                 $id
             ]);
             
-            // 2. Xóa toàn bộ chi tiết Cont cũ của đơn này trong bảng logis_order_details
             $stmtDel = $this->pdo->prepare("DELETE FROM logis_order_details WHERE order_id = ?");
             $stmtDel->execute([$id]);
             
-            // 3. Insert lại danh sách Cont mới từ Form gửi lên (từ Mảng containers)
             if (isset($_POST['containers']) && is_array($_POST['containers'])) {
                 $stmtInsert = $this->pdo->prepare("INSERT INTO logis_order_details (order_id, pricing_id, quantity) VALUES (?, ?, ?)");
                 foreach ($_POST['containers'] as $container) {
-                    // Chỉ lưu nếu có ID bảng giá và số lượng > 0
                     if (!empty($container['pricing_id']) && !empty($container['quantity']) && $container['quantity'] > 0) {
                         $stmtInsert->execute([$id, $container['pricing_id'], $container['quantity']]);
                     }
                 }
             }
+
+            // 3. TRIGGER THÔNG BÁO: ĐÃ SỬA ĐƠN HÀNG
+            // ==========================================
+            $editor_name = $_SESSION['username'] ?? 'Một nhân viên';
+            // Lấy order_code để báo cáo cho chính xác
+            $stmtCode = $this->pdo->prepare("SELECT order_code FROM logis_orders WHERE id = ?");
+            $stmtCode->execute([$id]);
+            $order_code = $stmtCode->fetchColumn() ?: "ID $id";
+
+            $title = "Đơn hàng vừa được chỉnh sửa";
+            $message = "Tài khoản $editor_name vừa cập nhật lại thông tin của đơn $order_code.";
+
+            $current_user_id = (int)($_SESSION['user_id'] ?? 0);
+            $stmtAdmins = $this->pdo->query("SELECT id FROM users WHERE is_active = 1 AND (role_id = 1 OR id = $current_user_id)");
+            $admins = $stmtAdmins->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($admins) {
+                // is_read = 0 (Trạng thái mặc định là chưa đọc)
+                $sqlNotif = "INSERT INTO notifications (user_id, title, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())";
+                $stmtNotif = $this->pdo->prepare($sqlNotif);
+
+                foreach ($admins as $admin) {
+                    $stmtNotif->execute([$admin['id'], $title, $message]);
+                }
+            }
+            // ==========================================
             
-            // Báo thành công và quay về trang danh sách
             $_SESSION['success_msg'] = "Đã cập nhật đơn hàng thành công!";
             header("Location: index.php?page=orders");
             exit;
         }
     }
-
     public function rejectOldPrice() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Lấy lý do từ form
@@ -265,7 +314,6 @@ class OrderController {
             $stmt->execute([$current_time, $user_name, $id]);
             $_SESSION['success_msg'] = "Đã duyệt đơn hàng thành công!";
             
-            // ==========================================
             // TRIGGER THÔNG BÁO: ĐƠN HÀNG ĐÃ ĐƯỢC DUYỆT
             // ==========================================
             $this->sendNotificationToStaffs("Đơn hàng đã được duyệt", "Lệnh ID [$id] đã được phê duyệt bởi $user_name.");
@@ -276,7 +324,6 @@ class OrderController {
             $stmt->execute([$current_time, $user_name, $id]);
             $_SESSION['success_msg'] = "Đã từ chối đơn hàng!";
             
-            // ==========================================
             // TRIGGER THÔNG BÁO: ĐƠN HÀNG BỊ TỪ CHỐI
             // ==========================================
             $this->sendNotificationToStaffs("Đơn hàng bị từ chối", "Lệnh ID [$id] đã bị $user_name từ chối duyệt.");
@@ -293,10 +340,9 @@ class OrderController {
         exit();
     }
 
-    // HÀM HỖ TRỢ: Gửi thông báo đến nhóm Staff (Role 3)
-    // Bạn dán hàm này nằm ngay dưới hàm changeStatus() nhé
     private function sendNotificationToStaffs($title, $message) {
-        $sqlGetStaff = "SELECT id FROM users WHERE role_id = 3 AND is_active = 1";
+        $current_user_id = (int)($_SESSION['user_id'] ?? 0);
+        $sqlGetStaff = "SELECT id FROM users WHERE is_active = 1 AND (role_id = 1 OR role_id = 3 OR id = $current_user_id)";
         $stmtUsers = $this->pdo->query($sqlGetStaff);
         $staffList = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
 
