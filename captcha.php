@@ -5,7 +5,7 @@ session_start();
 $chars = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
 $captcha_code = substr(str_shuffle($chars), 0, 5);
 
-// 2. Lưu vào session để tí nữa so sánh với user nhập
+// 2. Lưu vào session so sánh với user nhập
 $_SESSION['captcha_code'] = $captcha_code;
 
 // 3. Khởi tạo bức ảnh kích thước 120x40 pixel

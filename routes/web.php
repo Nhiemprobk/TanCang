@@ -26,7 +26,9 @@ switch ($page) {
         break;
 
     case 'home':
-        require_once 'app/Views/home/index.php';
+        require_once 'app/Controllers/HomeController.php';
+        $homeController = new HomeController();
+        $homeController->index();
         break;
 
     case 'profile':
